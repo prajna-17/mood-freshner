@@ -15,7 +15,7 @@ export default function Home() {
     <>
       <HomeTopSection />
       <DeliveryCard />
-      {/* <BannerSection /> */}
+      <BannerSection />
       <CategoriesSection />
       <BestSellers />
       <PromoBanner />
