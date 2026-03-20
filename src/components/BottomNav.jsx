@@ -22,6 +22,7 @@ export default function BottomNav() {
         className="fixed bottom-0 left-0 right-0 z-50"
         style={{
           background: "#3b82f6",
+          height: 70,
           boxShadow: "0 -6px 25px rgba(0,0,0,0.3)",
         }}
       >
