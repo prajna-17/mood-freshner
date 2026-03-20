@@ -119,7 +119,7 @@ export default function Header() {
         />
 
         <div
-          className="relative flex items-center justify-between px-4"
+          className="relative flex items-center justify-center px-4"
           style={{
             height: scrolled ? 52 : 60,
             transition: "height 0.3s cubic-bezier(.22,1,.36,1)",
@@ -139,61 +139,6 @@ export default function Header() {
           </div>
 
           {/* ── Right: Icons ── */}
-          <div className="flex items-center gap-2">
-            {/* Bell */}
-            <button
-              className={`hdr-icon-btn hdr-icon-1 relative w-9 h-9 rounded-2xl flex items-center justify-center`}
-              style={{
-                background: "rgba(255,255,255,0.09)",
-                border: "1px solid rgba(255,255,255,0.12)",
-              }}
-              onClick={() => {
-                setBellShake(true);
-                setTimeout(() => setBellShake(false), 700);
-              }}
-            >
-              <Bell
-                className={bellShake ? "hdr-bell-shake" : ""}
-                style={{
-                  width: 16,
-                  height: 16,
-                  color: "rgba(255,255,255,0.8)",
-                }}
-              />
-              <span
-                className="hdr-badge absolute -top-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-bold text-white"
-                style={{
-                  background: "linear-gradient(135deg,#f97316,#ef4444)",
-                }}
-              >
-                2
-              </span>
-            </button>
-
-            {/* Cart */}
-            <button
-              className={`hdr-icon-btn hdr-icon-2 relative w-9 h-9 rounded-2xl flex items-center justify-center`}
-              style={{
-                background:
-                  "linear-gradient(135deg,rgba(245,200,66,0.2),rgba(251,146,60,0.15))",
-                border: "1px solid rgba(245,200,66,0.25)",
-              }}
-              onClick={handleCartClick}
-            >
-              <ShoppingCart
-                className={cartBump ? "hdr-cart-bump" : ""}
-                style={{ width: 16, height: 16, color: "#f5c842" }}
-              />
-              <span
-                className="hdr-badge absolute -top-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-bold text-white"
-                style={{
-                  background: "linear-gradient(135deg,#f97316,#fb923c)",
-                }}
-              >
-                3
-              </span>
-            </button>
-          </div>
         </div>
         {/* Bottom border glow */}
         <div
