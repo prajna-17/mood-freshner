@@ -41,7 +41,7 @@ export default function BottomNav() {
                   <>
                     {/* White curve */}
                     <div
-                      className="absolute -top-5"
+                      className="absolute -top-6"
                       style={{
                         width: 50,
                         height: 30,
@@ -54,7 +54,7 @@ export default function BottomNav() {
 
                     {/* Circle */}
                     <div
-                      className="absolute  flex items-center justify-center -top-14"
+                      className="absolute  flex items-center justify-center -top-10"
                       style={{
                         width: 30,
                         height: 30,
