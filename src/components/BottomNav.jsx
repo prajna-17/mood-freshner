@@ -59,7 +59,7 @@ export default function BottomNav() {
                         width: 60,
                         height: 60,
                         borderRadius: "50%",
-                        background: "#2563eb",
+                        background: "#3b82f6",
                         border: "6px solid white",
                         zIndex: 2,
                       }}
