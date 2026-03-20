@@ -41,7 +41,7 @@ export default function BottomNav() {
                   <>
                     {/* White curve */}
                     <div
-                      className="absolute -top-10"
+                      className="absolute -top-9"
                       style={{
                         width: 80,
                         height: 50,
