@@ -43,7 +43,7 @@ export default function BottomNav() {
                     <div
                       className="absolute"
                       style={{
-                        top: -4,
+                        top: -3,
                         left: "50%",
                         transform: "translateX(-50%)",
                         width: 70,
