@@ -6,7 +6,7 @@ import { Home, ShoppingCart, Settings, User } from "lucide-react";
 
 const NAV_ITEMS = [
   { label: "Home", href: "/", icon: Home },
-  { label: "Cart", href: "/cart", icon: ShoppingCart },
+  { label: "Cart", href: "/details", icon: ShoppingCart },
   { label: "Settings", href: "/settings", icon: Settings },
   { label: "Profile", href: "/profile", icon: User },
 ];
