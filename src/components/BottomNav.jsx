@@ -41,7 +41,7 @@ export default function BottomNav() {
                   <>
                     {/* White curve */}
                     <div
-                      className="absolute -top-6"
+                      className="absolute -top-7"
                       style={{
                         width: 50,
                         height: 30,
@@ -54,17 +54,18 @@ export default function BottomNav() {
 
                     {/* Circle */}
                     <div
-                      className="absolute  flex items-center justify-center -top-10"
+                      className="absolute flex items-center justify-center -top-10"
                       style={{
                         width: 30,
                         height: 30,
                         borderRadius: "50%",
-                        background: "#3b82f6",
-                        border: "6px solid white",
+                        background: "#3b82f6", // 🔵 blue circle
+                        border: "4px solid white",
                         zIndex: 2,
                       }}
                     >
-                      <Icon color="white" size={26} strokeWidth={2.5} />
+                      <Icon color="white" size={18} strokeWidth={2.5} />{" "}
+                      {/* 🤍 white icon */}
                     </div>
                   </>
                 )}
