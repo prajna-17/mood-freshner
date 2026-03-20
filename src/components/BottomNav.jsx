@@ -40,37 +40,25 @@ export default function BottomNav() {
                 {active && (
                   <>
                     {/* SVG smooth concave notch */}
-                    <svg
-                      width="90"
-                      height="60"
-                      viewBox="0 0 90 60"
+                    <div
                       className="absolute"
                       style={{
-                        top: -28,
+                        top: -8,
                         left: "50%",
                         transform: "translateX(-50%)",
+                        width: 70,
+                        height: 30,
+                        background: "white",
+                        borderBottomLeftRadius: 40,
+                        borderBottomRightRadius: 40,
                         zIndex: 1,
-                        display: "block",
-                        overflow: "visible",
                       }}
-                    >
-                      {/* Page bg color fills the notch shape */}
-                      <path
-                        d="M0,28 Q18,28 23,20 Q30,8 45,8 Q60,8 67,20 Q72,28 90,28 L90,0 L0,0 Z"
-                        fill="white" // ← change to your page bg color
-                      />
-                      {/* Blue fill under the arch gap */}
-                      <path
-                        d="M23,20 Q30,8 45,8 Q60,8 67,20 Q72,28 90,28 L90,60 L0,60 L0,28 Q18,28 23,20 Z"
-                        fill="#3b82f6"
-                      />
-                    </svg>
-
+                    />
                     {/* Circle */}
                     <div
                       className="absolute flex items-center justify-center"
                       style={{
-                        top: -38,
+                        top: -32,
                         left: "50%",
                         transform: "translateX(-50%)",
                         width: 52,
