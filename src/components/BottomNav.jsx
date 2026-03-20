@@ -22,7 +22,7 @@ export default function BottomNav() {
         className="fixed bottom-0 left-0 right-0 z-50"
         style={{
           background: "#3b82f6",
-          height: 70,
+          height: 50,
           boxShadow: "0 -6px 25px rgba(0,0,0,0.3)",
         }}
       >
@@ -43,8 +43,8 @@ export default function BottomNav() {
                     <div
                       className="absolute -top-9"
                       style={{
-                        width: 80,
-                        height: 50,
+                        width: 50,
+                        height: 30,
                         background: "#fff",
                         borderBottomLeftRadius: 40,
                         borderBottomRightRadius: 40,
