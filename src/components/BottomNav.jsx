@@ -56,8 +56,8 @@ export default function BottomNav() {
                     <div
                       className="absolute  flex items-center justify-center -top-14"
                       style={{
-                        width: 60,
-                        height: 60,
+                        width: 30,
+                        height: 30,
                         borderRadius: "50%",
                         background: "#3b82f6",
                         border: "6px solid white",
