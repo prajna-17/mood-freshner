@@ -1,333 +1,139 @@
 "use client";
-
 import Link from "next/link";
 import Image from "next/image";
-import {
-  ShoppingBag,
-  Building2,
-  Leaf,
-  Phone,
-  ArrowUpRight,
-  Instagram,
-  Twitter,
-  Facebook,
-  MapPin,
-  Mail,
-  Heart,
-  ChevronDown,
-} from "lucide-react";
 import { useState } from "react";
 
-const SHOP_LINKS = [
-  { label: "Milk & Cream", href: "/category/milk" },
-  { label: "Butter & Ghee", href: "/category/butter" },
-  { label: "Cheese", href: "/category/cheese" },
-  { label: "Yogurt & Curd", href: "/category/yogurt" },
-  { label: "Eggs", href: "/category/eggs" },
-];
-
-const COMPANY_LINKS = [
-  { label: "About Us", href: "/about" },
-  { label: "Our Farms", href: "/farms" },
-  { label: "Blogs", href: "/blog" },
-  { label: "Contact Us", href: "/contact" },
-];
-
-const SOCIALS = [
-  { Icon: Facebook, href: "#", color: "#4267B2", label: "Facebook" },
-  { Icon: Twitter, href: "#", color: "#1DA1F2", label: "Twitter" },
-  { Icon: Instagram, href: "#", color: "#E1306C", label: "Instagram" },
-];
-
-const LEGAL = ["Privacy Policy", "Terms of Service", "Refund Policy"];
-
-function AccordionSection({ icon: Icon, title, links, color }) {
-  const [open, setOpen] = useState(false);
-  return (
-    <div
-      className="rounded-2xl overflow-hidden"
-      style={{
-        background: "rgba(255,255,255,0.05)",
-        border: "1px solid rgba(255,255,255,0.08)",
-      }}
-    >
-      <button
-        className="w-full flex items-center justify-between px-4 py-3.5"
-        onClick={() => setOpen((v) => !v)}
-      >
-        <div className="flex items-center gap-2.5">
-          <div
-            className="w-7 h-7 rounded-xl flex items-center justify-center"
-            style={{ background: `${color}28` }}
-          >
-            <Icon style={{ width: 14, height: 14, color }} strokeWidth={2.2} />
-          </div>
-          <span
-            className="text-[13px] font-bold uppercase tracking-widest text-white/90"
-            style={{
-              letterSpacing: "0.09em",
-              fontFamily: "'Bricolage Grotesque',sans-serif",
-            }}
-          >
-            {title}
-          </span>
-        </div>
-        <ChevronDown
-          style={{
-            width: 16,
-            height: 16,
-            color: "rgba(255,255,255,0.4)",
-            transform: open ? "rotate(180deg)" : "rotate(0deg)",
-            transition: "transform 0.25s cubic-bezier(.22,1,.36,1)",
-          }}
-          strokeWidth={2.5}
-        />
-      </button>
-
-      <div
-        style={{
-          maxHeight: open ? 300 : 0,
-          overflow: "hidden",
-          transition: "max-height 0.35s cubic-bezier(.22,1,.36,1)",
-        }}
-      >
-        <div className="px-4 pb-4 pt-1 space-y-2.5">
-          {links.map((link, i) => (
-            <Link
-              key={i}
-              href={link.href}
-              className="flex items-center justify-between group"
-            >
-              <span className="text-[13px] text-white/55 group-hover:text-white transition-colors font-medium">
-                {link.label}
-              </span>
-              <ArrowUpRight
-                style={{
-                  width: 12,
-                  height: 12,
-                  color: "rgba(255,255,255,0.25)",
-                }}
-                strokeWidth={2}
-              />
-            </Link>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
+const footerLinks = {
+  SHOP: [
+    { label: "Milk & Cream", href: "/category/milk" },
+    { label: "Butter & Ghee", href: "/category/butter" },
+    { label: "Cheese", href: "/category/cheese" },
+    { label: "Yogurt & Curd", href: "/category/yogurt" },
+    { label: "Eggs", href: "/category/eggs" },
+  ],
+  COMPANY: [
+    { label: "About Us", href: "/about" },
+    { label: "Our Farms", href: "/farms" },
+    { label: "Blogs", href: "/blog" },
+    { label: "Contact Us", href: "/contact" },
+  ],
+};
 
 export default function Footer() {
   return (
-    <>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap');
-        .ft-root { font-family: 'DM Sans', sans-serif; }
+    <footer className="bg-[#1a3c5e] text-white relative overflow-hidden">
+      {/* Decorative background blobs */}
+      <div className="absolute top-0 left-0 w-64 h-64 bg-white/5 rounded-full -translate-x-1/2 -translate-y-1/2 blur-3xl pointer-events-none" />
+      <div className="absolute bottom-0 right-0 w-96 h-96 bg-[#f5c842]/5 rounded-full translate-x-1/3 translate-y-1/3 blur-3xl pointer-events-none" />
 
-        @keyframes ftSlideIn  { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
-        @keyframes ftPop      { 0%{opacity:0;transform:scale(0.8)} 65%{transform:scale(1.07)} 100%{opacity:1;transform:scale(1)} }
-        @keyframes ftHeartBeat{ 0%,100%{transform:scale(1)} 14%{transform:scale(1.3)} 28%{transform:scale(1)} 42%{transform:scale(1.3)} 70%{transform:scale(1)} }
-        @keyframes ftGlow     { 0%,100%{opacity:0.4} 50%{opacity:0.8} }
-        @keyframes ftShimmer  { from{background-position:-200% center} to{background-position:200% center} }
+      {/* Wave divider */}
+      {/* <div className="w-full overflow-hidden leading-none -mt-1">
+        <svg
+          viewBox="0 0 1440 60"
+          preserveAspectRatio="none"
+          className="w-full h-14 fill-gray-50"
+        >
+          <path d="M0,40 C360,80 1080,0 1440,40 L1440,0 L0,0 Z" />
+        </svg>
+      </div> */}
 
-        .ft-in-0  { animation: ftSlideIn 0.5s cubic-bezier(.22,1,.36,1) both 0.05s }
-        .ft-in-1  { animation: ftSlideIn 0.5s cubic-bezier(.22,1,.36,1) both 0.12s }
-        .ft-in-2  { animation: ftSlideIn 0.5s cubic-bezier(.22,1,.36,1) both 0.19s }
-        .ft-in-3  { animation: ftSlideIn 0.5s cubic-bezier(.22,1,.36,1) both 0.26s }
-        .ft-in-4  { animation: ftSlideIn 0.5s cubic-bezier(.22,1,.36,1) both 0.33s }
-        .ft-in-5  { animation: ftSlideIn 0.5s cubic-bezier(.22,1,.36,1) both 0.40s }
+      <div className="max-w-7xl mx-auto px-4 pt-6 pb-12 relative z-10">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+          {/* Brand column */}
+          <div>
+            <div className="space-y-3">
+              <Image
+                src="/img/logo1.png"
+                alt="MoodFresh"
+                width={140}
+                height={50}
+              />
+              <p className="text-white/70 text-sm">
+                Farm fresh dairy, delivered with love.
+              </p>
+            </div>
+            <p className="text-white/60 text-sm leading-relaxed mb-5">
+              Farm fresh dairy, delivered with love. Pure, natural, and straight
+              from happy farms to your doorstep.
+            </p>
+          </div>
 
-        .ft-social { transition: transform 0.18s cubic-bezier(.22,1,.36,1), box-shadow 0.18s; }
-        .ft-social:active { transform: scale(0.88) !important; }
-        .ft-social:hover  { transform: scale(1.1) translateY(-2px); }
-
-        .ft-heart { animation: ftHeartBeat 2.4s ease-in-out infinite; }
-        .ft-glow  { animation: ftGlow 2.5s ease-in-out infinite; }
-
-        .ft-pop-0 { animation: ftPop 0.42s cubic-bezier(.22,1,.36,1) both 0.35s }
-        .ft-pop-1 { animation: ftPop 0.42s cubic-bezier(.22,1,.36,1) both 0.43s }
-        .ft-pop-2 { animation: ftPop 0.42s cubic-bezier(.22,1,.36,1) both 0.51s }
-
-        .ft-brand-text {
-          background: linear-gradient(90deg, #f5c842, #fb923c, #f5c842);
-          background-size: 200% auto;
-          -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-          background-clip: text;
-          animation: ftShimmer 3s linear infinite;
-        }
-        .ft-legal-link { transition: color 0.15s; }
-        .ft-legal-link:active { transform: scale(0.95); }
-      `}</style>
-
-      <footer
-        className="ft-root relative overflow-hidden"
-        style={{
-          background:
-            "linear-gradient(170deg, #0f1f3d 0%, #1a3a6e 50%, #0c1a38 100%)",
-        }}
-      >
-        {/* Glow blobs */}
-        <div
-          className="ft-glow absolute top-0 left-0 w-48 h-48 rounded-full pointer-events-none"
-          style={{
-            background:
-              "radial-gradient(circle, rgba(245,200,66,0.12) 0%, transparent 70%)",
-            transform: "translate(-40%,-40%)",
-          }}
-        />
-        <div
-          className="ft-glow absolute bottom-0 right-0 w-56 h-56 rounded-full pointer-events-none"
-          style={{
-            background:
-              "radial-gradient(circle, rgba(59,130,246,0.1) 0%, transparent 70%)",
-            transform: "translate(30%,30%)",
-            animationDelay: "1.2s",
-          }}
-        />
-
-        {/* Wave */}
-        <div className="w-full overflow-hidden leading-none -mt-px">
-          <svg
-            viewBox="0 0 390 48"
-            preserveAspectRatio="none"
-            className="w-full"
-            style={{ height: 40, display: "block", fill: "#f8faff" }}
-          >
-            <path d="M0,32 C80,52 160,12 240,32 C300,48 350,16 390,28 L390,0 L0,0 Z" />
-          </svg>
+          {/* SHOP + COMPANY side by side */}
+          <div className="grid grid-cols-2 gap-10">
+            {Object.entries(footerLinks).map(([title, links]) => (
+              <div key={title}>
+                <h4 className="text-[#f5c842] font-black text-sm tracking-widest uppercase mb-4">
+                  {title}
+                </h4>
+                <ul className="space-y-2.5">
+                  {links.map((link, i) => (
+                    <li key={i}>
+                      <Link
+                        href={link.href}
+                        className="text-white/60 hover:text-white text-sm transition-all duration-200 hover:translate-x-1 inline-block group"
+                      >
+                        <span className="group-hover:text-[#f5c842] transition-colors">
+                          ›
+                        </span>{" "}
+                        {link.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
         </div>
 
-        <div className="px-4 pt-4 pb-8 space-y-5 relative z-10">
-          {/* ── Brand Block ── */}
-          <div
-            className="ft-in-0 flex flex-col items-center text-center gap-3 py-4 rounded-3xl"
-            style={{
-              background: "rgba(255,255,255,0.04)",
-              border: "1px solid rgba(255,255,255,0.08)",
-            }}
-          >
-            <Image
-              src="/img/logo1.png"
-              alt="MoodFresh"
-              width={130}
-              height={46}
-              className="object-contain"
-            />
-            <p className="text-white/55 text-[13px] leading-relaxed max-w-[260px]">
-              Pure, natural dairy — straight from happy farms to your doorstep.
-            </p>
+        {/* Bottom bar */}
+        <div className="border-t border-white/10 mt-10 pt-6 flex flex-col md:flex-row items-center justify-between gap-4">
+          <p className="text-white/40 text-xs">
+            © 2025 MoodFresh. All rights reserved. Made with 🧀 in India.
+          </p>
 
-            {/* Contact pills */}
-            <div className="flex gap-2 flex-wrap justify-center">
-              <div
-                className="flex items-center gap-1.5 rounded-full px-3 py-1.5"
-                style={{
-                  background: "rgba(255,255,255,0.07)",
-                  border: "1px solid rgba(255,255,255,0.1)",
-                }}
-              >
-                <MapPin
-                  style={{ width: 12, height: 12, color: "#f5c842" }}
-                  strokeWidth={2.5}
-                />
-                <span className="text-white/60 text-[11px] font-medium">
-                  Noida, India
-                </span>
-              </div>
-              <div
-                className="flex items-center gap-1.5 rounded-full px-3 py-1.5"
-                style={{
-                  background: "rgba(255,255,255,0.07)",
-                  border: "1px solid rgba(255,255,255,0.1)",
-                }}
-              >
-                <Mail
-                  style={{ width: 12, height: 12, color: "#f5c842" }}
-                  strokeWidth={2.5}
-                />
-                <span className="text-white/60 text-[11px] font-medium">
-                  hello@moodfresh.in
-                </span>
-              </div>
-            </div>
-
-            {/* Social icons */}
-            <div className="flex gap-3 mt-1">
-              {SOCIALS.map(({ Icon, href, color, label }, i) => (
-                <a
-                  key={label}
-                  href={href}
-                  aria-label={label}
-                  className={`ft-social ft-pop-${i} w-10 h-10 rounded-2xl flex items-center justify-center`}
-                  style={{
-                    background: `${color}22`,
-                    border: `1.5px solid ${color}44`,
-                    boxShadow: `0 4px 14px ${color}22`,
-                  }}
-                >
-                  <Icon
-                    style={{ width: 16, height: 16, color }}
-                    strokeWidth={2}
-                  />
-                </a>
-              ))}
-            </div>
-          </div>
-
-          {/* ── Accordion nav ── */}
-          <div className="ft-in-1 space-y-2.5">
-            <AccordionSection
-              icon={ShoppingBag}
-              title="Shop"
-              links={SHOP_LINKS}
-              color="#f5c842"
-            />
-            <AccordionSection
-              icon={Building2}
-              title="Company"
-              links={COMPANY_LINKS}
-              color="#60a5fa"
-            />
-          </div>
-
-          {/* ── App store badges (placeholder buttons) ── */}
-
-          {/* ── Legal strip ── */}
-          <div className="ft-in-3 flex flex-wrap justify-center gap-x-4 gap-y-1.5 pt-1">
-            {LEGAL.map((l) => (
-              <Link
-                key={l}
+          {/* Social icons moved here */}
+          <div className="flex items-center gap-3">
+            {[
+              {
+                icon: "M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12.07h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12.07h2.773l-.443 2.89h-2.33v6.988C20.343 21.128 24 16.991 24 12.073z",
+              },
+              {
+                icon: "M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z",
+              },
+              {
+                icon: "M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069z",
+              },
+            ].map((s, i) => (
+              <a
+                key={i}
                 href="#"
-                className="ft-legal-link text-[11px] text-white/30 hover:text-white/60"
+                className="w-9 h-9 rounded-full bg-white/10 hover:bg-[#f5c842] flex items-center justify-center transition-all duration-300 hover:scale-110"
               >
-                {l}
-              </Link>
+                <svg
+                  className="w-4 h-4 fill-white/70 hover:fill-[#1a3c5e]"
+                  viewBox="0 0 24 24"
+                >
+                  <path d={s.icon} />
+                </svg>
+              </a>
             ))}
           </div>
 
-          {/* ── Copyright ── */}
-          <div className="ft-in-4 text-center">
-            <p className="text-white/30 text-[11.5px] leading-relaxed">
-              © 2025 <span className="ft-brand-text font-bold">MoodFresh</span>.
-              All rights reserved.
-            </p>
-            <p className="text-white/25 text-[11px] mt-1 flex items-center justify-center gap-1">
-              Made with{" "}
-              <Heart
-                className="ft-heart inline-block"
-                style={{
-                  width: 11,
-                  height: 11,
-                  color: "#fb7185",
-                  fill: "#fb7185",
-                }}
-                strokeWidth={0}
-              />{" "}
-              & 🧀 in India
-            </p>
+          <div className="flex items-center gap-4">
+            {["Privacy Policy", "Terms of Service", "Refund Policy"].map(
+              (l, i) => (
+                <Link
+                  key={i}
+                  href="#"
+                  className="text-white/40 hover:text-[#f5c842] text-xs transition-colors"
+                >
+                  {l}
+                </Link>
+              ),
+            )}
           </div>
         </div>
-      </footer>
-    </>
+      </div>
+    </footer>
   );
 }
