@@ -1,8 +1,10 @@
 "use client";
 
 import { ShoppingCart, Bell, Search, Mic } from "lucide-react";
-
+import { useRouter } from "next/navigation";
 export default function HomeTopSection() {
+  const router = useRouter();
+
   return (
     <div className="px-4 pt-4 space-y-4">
       {/* Top Row */}
@@ -25,7 +27,10 @@ export default function HomeTopSection() {
 
         {/* Icons */}
         <div className="flex gap-3">
-          <div className="bg-blue-100 p-3 rounded-xl">
+          <div
+            onClick={() => router.push("/cart")}
+            className="bg-blue-100 p-3 rounded-xl cursor-pointer"
+          >
             <ShoppingCart className="w-5 h-5 text-blue-700" />
           </div>
 

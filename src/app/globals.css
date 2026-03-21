@@ -10,3 +10,15 @@
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* hide scrollbar */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.cart-title {
+  font-family: "Playfair Display", serif;
+}
