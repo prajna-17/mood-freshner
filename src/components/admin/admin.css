@@ -1,0 +1,867 @@
+/* ==========================================================
+   MONTO ADMIN PANEL — CLEANINGBUDDY STYLE (WHITE + ORANGE)
+   Minimal • Premium • Professional • Clean • Corporate
+========================================================== */
+
+:root {
+  /* BRAND – DARK BLUE */
+  --brand: #0f243e; /* deep navy */
+  --brand-dark: #0b1b2f; /* darker navy */
+  --brand-light: #1c3b63; /* accent blue */
+
+  /* BACKGROUNDS */
+  --bg: #0f243e; /* main background */
+  --bg-soft: #142b4d; /* cards / sections */
+  --bg-sidebar: #0b1b2f; /* sidebar */
+  --bg-header: #0b1b2f; /* header */
+
+  /* TEXT (HIGH CONTRAST) */
+  --text: #ffffff; /* primary text */
+  --text-soft: #cfd8e3; /* secondary text */
+  --text-muted: #9aa8bb; /* labels */
+
+  /* BORDERS & EFFECTS */
+  --border: rgba(255, 255, 255, 0.08);
+  --radius: 8px;
+  --shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+
+  /* ACTION COLORS */
+  --danger: #ff6b6b;
+  --success: #4cd964;
+}
+
+/* ==========================================================
+   MAIN LAYOUT
+========================================================== */
+
+.admin-main {
+  display: flex;
+  min-height: 100vh;
+  background: #ffffff;
+}
+
+.admin-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 58px;
+  background: var(--bg);
+  /* WHITE HEADER — same as CleaningBuddy */
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 18px;
+  font-size: 19px;
+  font-weight: 600;
+  color: var(--text);
+  z-index: 20;
+}
+
+.sidebar-btn {
+  background: transparent;
+  border: none;
+  font-size: 22px;
+  margin-right: 12px;
+  cursor: pointer;
+  color: var(--text);
+  display: none;
+}
+
+@media (max-width: 850px) {
+  .sidebar-btn {
+    display: block;
+  }
+}
+
+/* ==========================================================
+   SIDEBAR (WHITE + ORANGE ACTIVE)
+========================================================== */
+
+.admin-sidebar {
+  width: 220px;
+  background: white;
+  border-right: 1px solid var(--border);
+  padding: 18px 14px;
+  position: fixed;
+  top: 58px;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  z-index: 10;
+  padding-top: 25px !important;
+}
+
+.admin-link {
+  display: block;
+  padding: 12px 15px;
+  border-radius: var(--radius);
+  text-decoration: none;
+  color: white;
+  font-size: 15px;
+  font-weight: 500;
+  margin-bottom: 5px;
+  background-color: #1c3b63;
+}
+
+.admin-link:hover {
+  background: #0b1b2f;
+}
+
+.admin-link.active {
+  background: var(--brand);
+  color: white;
+}
+
+/* ==========================================================
+   CONTENT AREA
+========================================================== */
+
+.admin-content {
+  margin-left: 240px;
+  padding: 85px 26px 26px;
+  width: 100%;
+}
+
+@media (max-width: 850px) {
+  .admin-content {
+    margin-left: 0;
+  }
+}
+
+/* ==========================================================
+   PAGE TITLES
+========================================================== */
+
+.page-title {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 18px;
+  color: #0b1b2f;
+  border-bottom: 2px solid var(--border);
+  padding-bottom: 6px;
+  width: max-content;
+}
+
+.page-title-underline {
+  width: 140px;
+  height: 3px;
+  background: var(--monto-orange);
+  border-radius: 2px;
+  margin-bottom: 25px;
+}
+
+/* ==========================================================
+   DASHBOARD CARDS
+========================================================== */
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 18px;
+}
+
+.stat-label {
+  font-size: 14px;
+  color: var(--text-light);
+}
+
+.stat-value {
+  margin-top: 6px;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+/* Make dashboard wider and cleaner */
+.stats-wide {
+  margin-top: 20px;
+  gap: 22px;
+}
+
+/* Bigger stat cards */
+.stat-card {
+  height: 150px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* Recently Added box */
+.recent-box {
+  margin-top: 30px;
+  background: white;
+  padding: 18px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.recent-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-top: 38px;
+  margin-bottom: 6px;
+  color: #000;
+}
+
+.recent-empty {
+  color: #000;
+}
+
+.dashboard-card h4 {
+  font-size: 15px;
+  margin-bottom: 10px;
+  font-weight: 500;
+}
+
+/* ==========================================================
+   CATEGORY PAGE
+========================================================== */
+
+.category-form {
+  display: flex;
+  gap: 10px;
+  max-width: 420px;
+  margin-bottom: 20px;
+}
+
+.category-form input {
+  flex: 1;
+  padding: 10px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: white;
+}
+
+.create-button {
+  background: var(--brand);
+  color: white;
+  padding: 10px 14px;
+  border-radius: var(--radius);
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.create-button:hover {
+  background: var(--brand-dark);
+}
+
+.category-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.category-card {
+  background: white;
+  padding: 18px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.cat-name {
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.cat-status {
+  font-size: 14px;
+  color: var(--text-light);
+}
+
+/* Status Btn */
+.status-btn {
+  padding: 8px 12px;
+  border-radius: var(--radius);
+  font-size: 14px;
+  border: none;
+  cursor: pointer;
+}
+
+.status-btn.active {
+  background: var(--brand);
+  color: white;
+}
+
+.status-btn.inactive {
+  background: #ededed;
+  color: var(--text-light);
+}
+
+/* ==========================================================
+   PRODUCT PAGE
+========================================================== */
+
+.product-search {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 28px;
+  max-width: 460px;
+}
+
+.product-search input {
+  flex: 1;
+  padding: 10px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+.quick-btn {
+  background: var(--brand);
+  color: white;
+  padding: 10px 14px;
+  border-radius: var(--radius);
+  border: none;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.quick-btn:hover {
+  background: var(--brand-dark);
+}
+
+.product-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.product-card {
+  background: white;
+  padding: 18px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  display: flex;
+  gap: 18px;
+  align-items: center;
+}
+
+.product-img {
+  width: 110px;
+  height: 110px;
+  border-radius: var(--radius);
+  object-fit: cover;
+  background: #f0f0f0;
+}
+
+.product-info {
+  flex: 1;
+}
+
+.product-name {
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.product-price {
+  font-weight: 600;
+  color: var(--brand-dark);
+}
+
+.delete-btn {
+  background: var(--color-primary);
+  border: 1px solid #f0c5c3;
+  color: #b33a37;
+  padding: 8px 12px;
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.admin-logo {
+  width: 30px;
+  height: 50px;
+  object-fit: contain;
+}
+
+.admin-app-name {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-brown);
+}
+
+.modal-input {
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: white;
+  width: 100%;
+  font-size: 15px;
+  color: #ffffff;
+}
+
+.action-row {
+  margin-bottom: 20px;
+}
+
+.action-row button {
+  margin-right: 10px;
+}
+
+.primary-btn {
+  background: #1c3b63;
+  color: rgb(252, 249, 249);
+  padding: 10px 18px;
+  border-radius: var(--radius);
+  border: none;
+  font-weight: 500;
+  cursor: pointer;
+  font-size: 20px;
+  transition: 0.2s;
+}
+
+.primary-btn:hover {
+  background: #0b1b2f;
+}
+
+/* --- CLEANINGBUDDY STYLE DASHBOARD CARDS --- */
+
+.dashboard-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 22px;
+  margin-top: 25px;
+}
+
+/* 1. Large card layout */
+.dashboard-card {
+  background: #1c3b63;
+  /* extremely light orange */
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(209, 60, 60, 0.06);
+  border-left: 4px solid var(--color-dark-brown);
+  transition: all 0.25s ease;
+}
+
+/* Hover Animation – lift + smooth dance */
+.dashboard-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+  background: #0b1b2f;
+  /* slightly deeper orange tint on hover */
+}
+
+/* 2. Main title inside card */
+.dashboard-card-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* 3. Big number */
+.dashboard-card-value {
+  font-size: 32px;
+  font-weight: 700;
+  margin-top: 8px;
+  color: var(--text);
+}
+
+/* 4. Active / inactive small text */
+.dashboard-card-sub {
+  font-size: 13px;
+  color: var(--text-light);
+  margin-top: 4px;
+}
+
+/* --- DASHBOARD TOP BUTTONS (CleaningBuddy Style) --- */
+
+.dashboard-actions {
+  display: flex;
+  gap: 14px;
+  margin-bottom: 22px;
+}
+
+.dash-btn {
+  background: #1c3b63;
+  color: white;
+  border: none;
+  padding: 12px 22px;
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.08);
+  transition: 0.2s ease;
+}
+
+.dash-btn:hover {
+  background: #0b1b2f;
+  transform: translateY(-2px);
+}
+
+.dashboard-card h4 {
+  font-size: 15px;
+  margin-bottom: 10px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.dashboard-card .stat-value {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+/* Search + Create Row */
+.cat-top-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.search-input {
+  padding: 12px;
+  width: 260px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  color: #000;
+}
+
+/* GRID LAYOUT */
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+/* CATEGORY CARD */
+.category-card {
+  background: white;
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+  transition: all 0.25s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.category-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+
+/* Category Image */
+.category-img {
+  width: 110px;
+  height: 110px;
+  border-radius: 12px;
+  object-fit: cover;
+  margin-bottom: 10px;
+}
+
+/* Title */
+.category-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: #000;
+}
+
+/* ACTION BUTTONS */
+.category-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.edit-btn,
+.delete-btn,
+.inactive-btn {
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  border: none;
+}
+
+.edit-btn {
+  background: #1c3b63;
+  color: white;
+}
+
+.delete-btn {
+  background: var(--color-primary);
+  color: #cc4242;
+}
+
+.inactive-btn {
+  background: #f1f1f1;
+  color: #555;
+}
+
+/* ---------- Product grid (premium) ---------- */
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  /* now shows 2 cards per row */
+  gap: 26px;
+}
+
+.product-card {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+  display: flex;
+  transition:
+    transform 0.22s ease,
+    box-shadow 0.22s ease;
+}
+
+.product-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.09);
+}
+
+.product-media {
+  width: 160px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fafafa;
+}
+
+.product-img {
+  width: 130px;
+  height: 130px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.product-body {
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.product-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.product-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #222;
+}
+
+.product-price {
+  color: var(--brand-dark);
+  font-weight: 700;
+}
+
+.product-sub {
+  font-size: 13px;
+  color: var(--text-light);
+  margin-bottom: 12px;
+  display: flex;
+  gap: 12px;
+}
+
+.product-actions {
+  margin-top: auto;
+  display: flex;
+  gap: 8px;
+}
+
+/* small button styles */
+.primary-btn.small {
+  padding: 8px 10px;
+  font-size: 13px;
+}
+
+.delete-btn.small {
+  padding: 8px 10px;
+  font-size: 13px;
+}
+
+.inactive-btn.small {
+  padding: 8px 10px;
+  font-size: 13px;
+}
+
+/* reuse modal-input and quick-btn styles from admin.css */
+
+.image-preview-box {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+  overflow-x: auto;
+}
+
+.preview-img {
+  width: 110px;
+  height: 110px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #eee;
+}
+
+.no-img {
+  color: #777;
+  font-size: 14px;
+}
+
+.create-btn {
+  margin-top: 12px !important;
+  /* small & cute spacing */
+  display: inline-block;
+}
+
+.instock-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px !important;
+  /* reduce spacing */
+}
+
+.form-row {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  /* consistent vertical spacing */
+}
+
+.modal-input {
+  margin-bottom: 0 !important;
+  /* remove extra accidental margins */
+  color: #070707;
+}
+
+.select-input {
+  margin-top: 2px !important;
+  /* align dropdown perfectly */
+}
+
+/* ------------------------------
+   RESPONSIVE (MOBILE VIEW)
+--------------------------------*/
+@media (max-width: 768px) {
+  /* Sidebar */
+  .admin-sidebar {
+    position: fixed;
+    left: -260px;
+    top: 60px;
+    width: 220px;
+    height: 100%;
+    transition: 0.3s ease;
+  }
+
+  .admin-sidebar.open {
+    left: 0;
+  }
+
+  /* Header */
+  .admin-header {
+    padding: 10px 14px;
+  }
+
+  /* Content area */
+  .admin-content {
+    margin-left: 240px;
+    padding: 85px 26px 26px;
+    width: 100%;
+    background: #ffffff; /* KEEP PAGE WHITE */
+  }
+
+  /* Product grid */
+  .product-grid {
+    grid-template-columns: 1fr !important;
+    /* 1 card per row */
+  }
+
+  .product-card {
+    width: 100%;
+  }
+
+  /* Forms */
+  .modal-input,
+  textarea,
+  select {
+    width: 100% !important;
+  }
+
+  /* Buttons */
+  .primary-btn,
+  .delete-btn,
+  .inactive-btn {
+    width: 100%;
+    margin-top: 6px;
+  }
+
+  .product-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  /* Create / Edit page container */
+  .form-wrapper {
+    padding: 10px !important;
+  }
+}
+
+.form-group {
+  margin-bottom: 14px;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 14px;
+  font-weight: 500;
+}
+html,
+body {
+  background: #ffffff !important;
+}
+
+/* ===== FIX SIDEBAR MOBILE PROPERLY ===== */
+@media (max-width: 768px) {
+  .admin-sidebar {
+    position: fixed;
+    top: 58px;
+    left: -240px;
+    width: 220px;
+    height: calc(100vh - 58px);
+    background: #0b1b2f;
+    transition: left 0.3s ease;
+    z-index: 1000;
+  }
+
+  .admin-sidebar.open {
+    left: 0;
+  }
+
+  /* overlay */
+  .admin-sidebar.open::after {
+    content: "";
+    position: fixed;
+    top: 58px;
+    left: 220px;
+    width: calc(100vw - 220px);
+    height: calc(100vh - 58px);
+    background: rgba(0, 0, 0, 0.3);
+  }
+
+  /* FIX CONTENT SHIFT (IMPORTANT) */
+  .admin-content {
+    margin-left: 0 !important;
+  }
+}

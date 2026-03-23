@@ -519,42 +519,6 @@ export default function ProfilePage() {
       </div>
 
       {/* ── Bottom Navigation ── */}
-      <div
-        className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md z-30"
-        style={{
-          background: "white",
-          borderTop: "1px solid #e0f2fe",
-          boxShadow: "0 -4px 20px rgba(0,0,0,0.08)",
-        }}
-      >
-        <div className="flex items-center justify-around px-2 py-3">
-          {navItems.map(({ Icon, label, href, active }) => (
-            <Link key={label} href={href}>
-              <button className="nav-btn flex flex-col items-center gap-1 px-4 py-1 rounded-2xl relative">
-                {active ? (
-                  <div
-                    className="w-12 h-10 rounded-2xl flex items-center justify-center"
-                    style={{
-                      background: "linear-gradient(135deg,#1565c0,#1e88e5)",
-                      boxShadow: "0 4px 14px rgba(21,101,192,0.4)",
-                    }}
-                  >
-                    <Icon size={20} color="white" strokeWidth={2.2} />
-                  </div>
-                ) : (
-                  <Icon size={22} color="#94a3b8" strokeWidth={2} />
-                )}
-                <span
-                  className="text-[10px] font-black"
-                  style={{ color: active ? "#1565c0" : "#94a3b8" }}
-                >
-                  {label}
-                </span>
-              </button>
-            </Link>
-          ))}
-        </div>
-      </div>
     </div>
   );
 }
