@@ -5,6 +5,7 @@ import CouponCard from "@/components/cart/CouponCard";
 import OrderSummary from "@/components/cart/OrderSummary";
 import TrustSection from "@/components/cart/TrustSection";
 import RecentlyPurchased from "@/components/home/RecentlyPurchased";
+import CheckoutBar from "@/components/cart/CheckoutBar";
 
 export default function CartPage() {
   return (
@@ -16,6 +17,7 @@ export default function CartPage() {
       <OrderSummary />
       <TrustSection />
       <RecentlyPurchased />
+      <CheckoutBar />
     </div>
   );
 }
