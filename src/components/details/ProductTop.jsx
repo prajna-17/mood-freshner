@@ -3,29 +3,49 @@
 import { useState } from "react";
 import Image from "next/image";
 import { Heart, Share2, Star } from "lucide-react";
-
-export default function ProductTop() {
+import { useRouter } from "next/navigation";
+export default function ProductTop({ product }) {
+  const router = useRouter();
   const [qty, setQty] = useState(1);
-
-  const increase = () => setQty((q) => q + 1);
+  const [showFull, setShowFull] = useState(false);
+  const increase = () => {
+    if (qty < product.quantity) {
+      setQty((q) => q + 1);
+    }
+  };
   const decrease = () => setQty((q) => (q > 1 ? q - 1 : 1));
 
+  if (!product) return null;
+  const BEVERAGE_ID = "69ca70a80971faee317396f7";
+
+  const isBeverage =
+    typeof product.superCategory === "object"
+      ? product.superCategory._id === BEVERAGE_ID
+      : product.superCategory === BEVERAGE_ID;
   return (
     <div className="bg-white">
       {/* HEADER */}
       <div className="flex items-center justify-between px-4 py-3 border-b">
-        <button className="text-lg">←</button>
-        <h1 className="font-medium text-black">Cream Milk</h1>
-        <button className="text-orange-500 text-lg font-bold">×</button>
+        <button onClick={() => router.back()} className="text-lg">
+          ←
+        </button>{" "}
       </div>
 
-      {/* BLUE SECTION */}
-      <div className="bg-[#2f6fad] relative px-4 py-6">
-        <span className="absolute top-3 left-3 bg-yellow-400 text-xs px-2 py-1 rounded">
-          Best Seller
+      {/* IMAGE SECTION */}
+      <div className="relative w-full h-64 overflow-hidden bg-[#2f6fad]">
+        <Image
+          src={product.images?.[0] || "/img/placeholder.jpg"}
+          alt={product.title}
+          fill
+          priority
+          className="object-cover"
+        />
+
+        <span className="absolute top-3 left-3 bg-yellow-400 text-xs px-2 py-1 rounded z-10">
+          {product.productSellingCategory || "Best Seller"}
         </span>
 
-        <div className="absolute top-3 right-3 flex gap-2">
+        <div className="absolute top-3 right-3 flex gap-2 z-10">
           <div className="bg-white p-2 rounded-full">
             <Heart size={16} />
           </div>
@@ -33,23 +53,13 @@ export default function ProductTop() {
             <Share2 size={16} />
           </div>
         </div>
-
-        <div className="flex justify-center mt-6">
-          <Image
-            src="/img/3milk.jpeg"
-            alt="milk"
-            width={170}
-            height={170}
-            priority
-          />
-        </div>
       </div>
 
       {/* DETAILS */}
       <div className="px-4 py-4">
         {/* TITLE */}
         <h2 className="font-medium text-[18px] text-black leading-tight">
-          Premium <br /> Full Cream Milk
+          {product.title}
         </h2>
 
         {/* STARS */}
@@ -57,52 +67,80 @@ export default function ProductTop() {
           {[...Array(5)].map((_, i) => (
             <Star key={i} size={14} fill="#facc15" stroke="#facc15" />
           ))}
-          <span className="text-sm text-gray-500 ml-2">4.8 (2.3k reviews)</span>
+          <span className="text-sm text-gray-500 ml-2">
+            ({product.reviews?.length || 256} reviews)
+          </span>
         </div>
 
         {/* PRICE */}
         <div className="flex items-center gap-2 mt-3">
-          <p className="text-[18px] font-semibold text-black">₹68</p>
+          <p className="text-[18px] font-semibold text-black">
+            ₹{product.price}
+          </p>
 
-          <p className="text-gray-400 line-through text-sm">₹85</p>
+          {product.oldPrice && (
+            <p className="text-gray-400 line-through text-sm">
+              ₹{product.oldPrice}
+            </p>
+          )}
 
-          <span className="bg-green-100 text-green-600 text-xs px-2 py-0.5 rounded-full font-medium">
-            20% OFF
-          </span>
+          {product.oldPrice && (
+            <span className="bg-green-100 text-green-600 text-xs px-2 py-0.5 rounded-full font-medium">
+              {Math.round(
+                ((product.oldPrice - product.price) / product.oldPrice) * 100,
+              )}
+              % OFF
+            </span>
+          )}
         </div>
 
-        {/* VOLUME */}
-        <div className="mt-4">
-          <p className="text-xs text-gray-500 mb-2">VOLUME</p>
-          <div className="flex gap-2 flex-wrap">
-            <button className="px-3 py-1 border rounded bg-blue-100 text-blue-600 text-sm">
-              500 ml
-            </button>
-            <button className="px-3 py-1 border rounded text-sm">
-              1 Litre
-            </button>
-            <button className="px-3 py-1 border rounded text-sm">
-              2 Litres
-            </button>
-            <button className="px-3 py-1 border rounded text-sm">+ More</button>
+        {/* VOLUME (STATIC UI KEEP) */}
+        {isBeverage && (
+          <div className="mt-4">
+            <p className="text-xs text-gray-500 mb-2">VOLUME</p>
+            <div className="flex gap-2 flex-wrap">
+              <button className="px-3 py-1 border rounded bg-blue-100 text-blue-600 text-sm">
+                500 ml
+              </button>
+              <button className="px-3 py-1 border rounded text-sm">
+                1 Litre
+              </button>
+              <button className="px-3 py-1 border rounded text-sm">
+                2 Litres
+              </button>
+              <button className="px-3 py-1 border rounded text-sm">
+                + More
+              </button>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* QUANTITY + STOCK */}
         <div className="flex items-center justify-between mt-4">
-          {/* Quantity */}
           <div className="flex items-center gap-3 border rounded px-2 py-1">
             <button onClick={decrease} className="text-lg px-2">
               -
             </button>
             <span className="font-medium text-black">{qty}</span>
-            <button onClick={increase} className="text-lg px-2">
+            <button
+              onClick={increase}
+              disabled={qty >= product.quantity}
+              className="text-lg px-2 disabled:opacity-30"
+            >
+              {" "}
               +
             </button>
           </div>
 
-          {/* Stock */}
-          <span className="text-green-600 text-sm font-medium">In Stock</span>
+          <span
+            className={`text-sm font-medium ${
+              qty <= product.quantity ? "text-green-600" : "text-red-500"
+            }`}
+          >
+            {qty <= product.quantity
+              ? `In Stock (${product.quantity} available)`
+              : "Only limited stock available"}
+          </span>
         </div>
 
         {/* BUTTONS */}
@@ -114,12 +152,11 @@ export default function ProductTop() {
             Add to Cart
           </button>
         </div>
-        {/* NUTRITION */}
+
+        {/* NUTRITION (kept static UI) */}
         <div className="mt-6">
-          {/* Heading OUTSIDE */}
           <p className="text-xs text-gray-500 mb-2">NUTRITION (PER 100ML)</p>
 
-          {/* Card */}
           <div className="bg-gray-200 rounded-lg p-4 shadow-sm">
             <div className="grid grid-cols-4 text-center gap-2">
               <div>
@@ -144,15 +181,22 @@ export default function ProductTop() {
             </div>
           </div>
         </div>
+
         {/* ABOUT */}
         <div className="mt-6">
           <p className="text-xs text-gray-900 b-1">ABOUT</p>
-          <p className="text-sm text-gray-700 leading-relaxed">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. In eget
-            sodales lorem. Vivamus molestie diam quis lorem ipsum.
+          <p
+            className={`text-sm text-gray-700 leading-relaxed ${
+              showFull ? "" : "line-clamp-5"
+            }`}
+          >
+            {product.description}
           </p>
-          <button className="text-orange-500 text-sm mt-1 font-medium">
-            Read More
+          <button
+            onClick={() => setShowFull(!showFull)}
+            className="text-orange-500 text-sm mt-1 font-medium"
+          >
+            {showFull ? "Show Less" : "Read More"}
           </button>
         </div>
       </div>

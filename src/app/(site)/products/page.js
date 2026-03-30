@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import HeaderSection from "@/components/products/HeaderSection";
 import CategoryTabs from "@/components/products/CategoryTabs";
 import ResultsBar from "@/components/products/ResultsBar";
@@ -6,14 +9,22 @@ import ProductsGrid from "@/components/products/ProductsGrid";
 import YouMayLike from "@/components/products/YouMayLike";
 
 export default function ProductsPage() {
+  const [products, setProducts] = useState([]);
+
   return (
     <div className="bg-white min-h-screen">
-      {" "}
       <HeaderSection />
+
       <CategoryTabs />
-      <ResultsBar />
+
+      {/* ✅ PASS COUNT */}
+      <ResultsBar count={products.length} />
+
       <DealBanner />
-      <ProductsGrid />
+
+      {/* ✅ PASS SETTER */}
+      <ProductsGrid setProducts={setProducts} />
+
       <YouMayLike />
     </div>
   );

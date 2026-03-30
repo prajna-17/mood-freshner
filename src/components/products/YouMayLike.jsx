@@ -3,25 +3,25 @@
 import Image from "next/image";
 import { Star } from "lucide-react";
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { API } from "@/utils/api";
 
 export default function YouMayLike() {
-  const items = [
-    {
-      name: "Fresh Butter",
-      img: "/img/butter.jpeg",
-      tag: "35% OFF",
-    },
-    {
-      name: "Fresh Cheese",
-      img: "/img/cheese.jpeg",
-      tag: "BUY 2 GET 1",
-    },
-    {
-      name: "Fresh Curd",
-      img: "/img/curd.jpeg",
-      tag: "20% OFF",
-    },
-  ];
+  const [items, setItems] = useState([]);
+
+  useEffect(() => {
+    fetch(`${API}/products`)
+      .then((r) => r.json())
+      .then((data) => {
+        const prods = Array.isArray(data) ? data : data.data || [];
+
+        // 👉 shuffle (random products)
+        const shuffled = prods.sort(() => 0.5 - Math.random());
+
+        setItems(shuffled.slice(0, 5)); // show few items
+      })
+      .catch(() => console.log("You may like fetch failed ❌"));
+  }, []);
 
   return (
     <div className="px-4 mt-10 space-y-4">
@@ -41,48 +41,57 @@ export default function YouMayLike() {
 
       {/* Slider */}
       <div className="flex gap-4 overflow-x-auto scrollbar-hide">
-        {items.map((item, index) => (
-          <div
-            key={index}
-            className="min-w-[160px] sm:min-w-[300px] border rounded-2xl p-2 bg-white"
-          >
-            {/* Tag */}
-            <span className="inline-block bg-orange-200 text-orange-700 text-xs px-3 py-1 rounded-full mb-2">
-              {item.tag}
-            </span>
+        {items.map((item) => {
+          const randomTag = ["20% OFF", "BUY 2 GET 1", "35% OFF"][
+            Math.floor(Math.random() * 3)
+          ];
 
-            {/* Content */}
-            <div className="flex items-center gap-3">
-              {/* Image */}
-              <div className="w-6 h-12 relative">
-                <Image
-                  src={item.img}
-                  alt={item.name}
-                  fill
-                  className="object-contain"
-                />
-              </div>
+          return (
+            <Link key={item._id} href={`/details/${item._id}`}>
+              <div className="min-w-[160px] sm:min-w-[300px] border rounded-2xl p-2 bg-white cursor-pointer">
+                {/* Tag */}
+                <span className="inline-block bg-orange-200 text-orange-700 text-xs px-3 py-1 rounded-full mb-2">
+                  {randomTag}
+                </span>
 
-              {/* Text */}
-              <div className="flex-1">
-                <p className="text-blue-500 font-md">{item.name}</p>
+                {/* Content */}
+                <div className="flex items-center gap-3">
+                  {/* Image */}
+                  <div className="w-12 h-12 relative">
+                    <Image
+                      src={item.images?.[0] || "/img/placeholder.jpg"}
+                      alt={item.title}
+                      fill
+                      className="object-contain"
+                    />
+                  </div>
 
-                <p className="text-gray-400 line-through text-sm">₹98/gram</p>
+                  {/* Text */}
+                  <div className="flex-1">
+                    <p className="text-blue-500 font-md">{item.title}</p>
 
-                <p className="text-lg font-semibold text-gray-900">
-                  ₹98 / gram
-                </p>
+                    {item.oldPrice && (
+                      <p className="text-gray-400 line-through text-sm">
+                        ₹{item.oldPrice}
+                      </p>
+                    )}
 
-                {/* Rating */}
-                <div className="flex text-orange-400 mt-1">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-4 h-4 fill-orange-400" />
-                  ))}
+                    <p className="text-lg font-semibold text-gray-900">
+                      ₹{item.price}
+                    </p>
+
+                    {/* Rating (random) */}
+                    <div className="flex text-orange-400 mt-1">
+                      {[...Array(5)].map((_, i) => (
+                        <Star key={i} className="w-4 h-4 fill-orange-400" />
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          </div>
-        ))}
+            </Link>
+          );
+        })}
       </div>
     </div>
   );

@@ -1,72 +1,87 @@
 "use client";
 
 import Image from "next/image";
-import { Heart, Star } from "lucide-react";
-
+import { Heart, Star, Plus } from "lucide-react";
+import Link from "next/link";
 export default function ProductCard({ item }) {
   return (
-    <div className="bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-100">
-      {/* IMAGE SECTION */}
-      <div className="bg-[#dfe7f5] p-4 relative">
-        {/* Tag */}
-        <span className="absolute top-3 left-3 bg-green-500 text-white text-xs px-3 py-1 rounded-full">
-          {item.tag}
-        </span>
+    <Link href={`/details/${item._id}`}>
+      <div className="bg-white rounded-3xl gap-3 shadow-md overflow-hidden border border-gray-100 w-full cursor-pointer">
+        {" "}
+        {/* IMAGE SECTION */}
+        <div className="relative h-[140px] w-full overflow-hidden">
+          {/* Tag */}
+          <span className="absolute top-3 left-3 z-10 bg-emerald-500 text-white text-[10px] font-semibold px-2.5 py-1 rounded-full tracking-wide">
+            {item.productSellingCategory || "best-selling"}
+          </span>
 
-        {/* Heart */}
-        <div className="absolute top-3 right-3 bg-white p-1.5 rounded-full shadow-sm">
-          <Heart size={14} />
-        </div>
+          {/* Heart */}
+          <button className="absolute top-3 right-3 z-10 bg-white p-1.5 rounded-full shadow-sm hover:scale-110 transition-transform">
+            <Heart size={13} className="text-gray-400" />
+          </button>
 
-        {/* Image */}
-        <div className="flex justify-center items-center h-[110px]">
+          {/* Image */}
           <Image
-            src={item.img}
-            alt={item.name}
-            width={90}
-            height={110}
-            className="object-contain"
+            src={item.images?.[0] || "/img/placeholder.jpg"}
+            alt={item.title}
+            fill
+            className="object-cover"
           />
         </div>
-      </div>
+        {/* DETAILS */}
+        <div className="p-3 pt-3">
+          <h3 className="text-sm font-bold text-gray-800 leading-tight mb-0.5">
+            {item.title}
+          </h3>
 
-      {/* DETAILS */}
-      <div className="p-3">
-        <h3 className="text-sm font-semibold text-gray-800 mb-1">
-          {item.name}
-        </h3>
+          <p className="text-[11px] text-gray-400 mb-2">
+            {item.quantity || 1} unit
+          </p>
 
-        <p className="text-xs text-gray-400 mb-1">1 Litre / 3.5% fat</p>
-
-        {/* Rating */}
-        <div className="flex items-center gap-1 mb-2">
-          {[...Array(5)].map((_, i) => (
-            <Star
-              key={i}
-              size={12}
-              className="fill-orange-400 text-orange-400"
-            />
-          ))}
-          <span className="text-xs text-[#2f6fb3] ml-1">(428)</span>
-        </div>
-
-        {/* Price */}
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-base font-semibold text-gray-800">
-              ₹ 68{" "}
-              <span className="text-xs text-gray-400 line-through ml-1">
-                ₹ 98
-              </span>
-            </p>
-            <p className="text-green-500 text-xs">20% off</p>
+          {/* Rating */}
+          <div className="flex items-center gap-0.5 mb-2.5">
+            {[...Array(5)].map((_, i) => (
+              <Star
+                key={i}
+                size={11}
+                className="fill-amber-400 text-amber-400"
+              />
+            ))}
+            <span className="text-[10px] text-blue-500 ml-1 font-medium">
+              ({item.reviews?.length || 246})
+            </span>
           </div>
-          {/* Add Button */}
-          <button className="bg-orange-500 text-white w-8 h-8 flex items-center justify-center rounded-lg">
-            +
-          </button>{" "}
+
+          {/* Price + Button */}
+          <div className="flex items-center justify-between">
+            <div className="flex flex-col">
+              <div className="flex items-baseline gap-1">
+                <span className="text-sm font-bold text-gray-900">
+                  ₹{item.price}
+                </span>
+                {item.oldPrice && (
+                  <span className="text-[11px] text-gray-400 line-through">
+                    ₹{item.oldPrice}
+                  </span>
+                )}
+              </div>
+              {item.oldPrice && (
+                <span className="text-[11px] font-semibold text-emerald-500">
+                  {Math.round(
+                    ((item.oldPrice - item.price) / item.oldPrice) * 100,
+                  )}
+                  % off
+                </span>
+              )}
+            </div>
+
+            {/* Add Button */}
+            <button className="bg-orange-500 hover:bg-orange-600 active:scale-95 transition-all text-white w-9 h-9 flex items-center justify-center rounded-xl shadow-md shadow-orange-200">
+              <Plus size={16} strokeWidth={2.5} />
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }

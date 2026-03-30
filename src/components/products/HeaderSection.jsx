@@ -1,19 +1,23 @@
 "use client";
-
+import { useRouter } from "next/navigation";
 import { ArrowLeft, Search, ShoppingCart } from "lucide-react";
 
 export default function HeaderSection() {
+  const router = useRouter();
   return (
     <div className="bg-[#eef1f7] px-4 pt-4 pb-5">
       {/* Top Row */}
       <div className="flex items-center justify-between mb-4">
         {/* Back Button */}
-        <div className="bg-[#dfe7f5] p-2 rounded-lg">
+        <div
+          onClick={() => router.back()}
+          className="bg-[#dfe7f5] p-2 rounded-lg cursor-pointer"
+        >
           <ArrowLeft size={18} className="text-gray-700" />
         </div>
 
         {/* Title */}
-        <h1 className="text-base font-semibold text-gray-800">Milk</h1>
+        {/* <h1 className="text-base font-semibold text-gray-800">Milk</h1> */}
 
         {/* Cart Button */}
         <div className="bg-orange-500 p-2 rounded-lg">
