@@ -15,8 +15,9 @@ export default function ProductsPage() {
     <div className="bg-white min-h-screen">
       <HeaderSection />
 
-      <CategoryTabs />
-
+      <Suspense fallback={<div>Loading tabs...</div>}>
+        <CategoryTabs />
+      </Suspense>
       {/* ✅ PASS COUNT */}
       <ResultsBar count={products.length} />
 
