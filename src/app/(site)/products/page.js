@@ -7,7 +7,7 @@ import ResultsBar from "@/components/products/ResultsBar";
 import DealBanner from "@/components/products/DealBanner";
 import ProductsGrid from "@/components/products/ProductsGrid";
 import YouMayLike from "@/components/products/YouMayLike";
-
+import { Suspense } from "react";
 export default function ProductsPage() {
   const [products, setProducts] = useState([]);
 
@@ -23,8 +23,9 @@ export default function ProductsPage() {
       <DealBanner />
 
       {/* ✅ PASS SETTER */}
-      <ProductsGrid setProducts={setProducts} />
-
+      <Suspense fallback={<div>Loading...</div>}>
+        <ProductsGrid setProducts={setProducts} />
+      </Suspense>
       <YouMayLike />
     </div>
   );
