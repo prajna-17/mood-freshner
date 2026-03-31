@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { getUserIdFromToken } from "@/utils/auth";
 import { useRouter } from "next/navigation";
+import { Suspense } from "react";
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
 
 // ─── Status → tracker step index ─────────────────────────────────────────────
@@ -122,7 +123,7 @@ function SkeletonCard({ height = "h-28" }) {
 }
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
-export default function OrderConfirmPage() {
+function OrderConfirmContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const orderId = searchParams.get("orderId");
@@ -779,5 +780,12 @@ export default function OrderConfirmPage() {
         )}
       </div>
     </div>
+  );
+}
+export default function OrderConfirmPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <OrderConfirmContent />
+    </Suspense>
   );
 }
