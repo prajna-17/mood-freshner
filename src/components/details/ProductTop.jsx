@@ -4,10 +4,15 @@ import { useState } from "react";
 import Image from "next/image";
 import { Heart, Share2, Star } from "lucide-react";
 import { useRouter } from "next/navigation";
+import LoginModal from "@/components/LoginModal";
+import { addToCart, clearCart } from "@/utils/cart";
+
 export default function ProductTop({ product }) {
   const router = useRouter();
   const [qty, setQty] = useState(1);
   const [showFull, setShowFull] = useState(false);
+  const [openLogin, setOpenLogin] = useState(false);
+  const [added, setAdded] = useState(false);
   const increase = () => {
     if (qty < product.quantity) {
       setQty((q) => q + 1);
@@ -22,6 +27,50 @@ export default function ProductTop({ product }) {
     typeof product.superCategory === "object"
       ? product.superCategory._id === BEVERAGE_ID
       : product.superCategory === BEVERAGE_ID;
+
+  const isLoggedIn = () => {
+    if (typeof window === "undefined") return false;
+    return !!localStorage.getItem("token");
+  };
+
+  // ✅ Add to cart
+  const handleAddToCart = () => {
+    if (!isLoggedIn()) {
+      setOpenLogin(true);
+      return;
+    }
+
+    addToCart({
+      ...product,
+      id: product._id,
+      availableQty: product.quantity,
+    });
+
+    setAdded(true);
+    setTimeout(() => setAdded(false), 1500);
+  };
+
+  // ✅ Buy now
+  const handleBuyNow = () => {
+    if (!isLoggedIn()) {
+      setOpenLogin(true);
+      return;
+    }
+
+    // 🔥 STORE ONLY THIS PRODUCT FOR CHECKOUT
+    localStorage.setItem(
+      "checkoutItem",
+      JSON.stringify({
+        ...product,
+        id: product._id,
+        qty: qty, // 🔥 VERY IMPORTANT (use selected qty)
+        image: product.images?.[0],
+        availableQty: product.quantity,
+      }),
+    );
+
+    router.push("/checkout");
+  };
   return (
     <div className="bg-white">
       {/* HEADER */}
@@ -46,9 +95,6 @@ export default function ProductTop({ product }) {
         </span>
 
         <div className="absolute top-3 right-3 flex gap-2 z-10">
-          <div className="bg-white p-2 rounded-full">
-            <Heart size={16} />
-          </div>
           <div className="bg-white p-2 rounded-full">
             <Share2 size={16} />
           </div>
@@ -145,10 +191,17 @@ export default function ProductTop({ product }) {
 
         {/* BUTTONS */}
         <div className="flex gap-3 mt-5">
-          <button className="flex-1 border border-orange-500 text-orange-500 py-2 rounded font-medium">
+          <button
+            onClick={handleBuyNow}
+            className="flex-1 border border-orange-500 text-orange-500 py-2 rounded font-medium"
+          >
             Buy Now
           </button>
-          <button className="flex-1 bg-orange-500 text-white py-2 rounded font-medium">
+
+          <button
+            onClick={handleAddToCart}
+            className="flex-1 bg-orange-500 text-white py-2 rounded font-medium"
+          >
             Add to Cart
           </button>
         </div>
@@ -200,6 +253,12 @@ export default function ProductTop({ product }) {
           </button>
         </div>
       </div>
+      <LoginModal isOpen={openLogin} onClose={() => setOpenLogin(false)} />
+      {added && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-black text-white px-6 py-2 rounded-full text-sm z-[2000]">
+          Added to cart
+        </div>
+      )}
     </div>
   );
 }

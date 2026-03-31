@@ -5,19 +5,27 @@ import { ShoppingCart, Star } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { API } from "@/utils/api";
-
+import LoginModal from "@/components/LoginModal";
+import { addToCart } from "@/utils/cart";
 export default function BestSellers() {
   const [products, setProducts] = useState([]);
+  const [openLogin, setOpenLogin] = useState(false);
+  const [added, setAdded] = useState(false);
 
   useEffect(() => {
     fetch(`${API}/products?productSellingCategory=best-selling`)
       .then((r) => r.json())
       .then((data) => {
         const prods = Array.isArray(data) ? data : data.data || [];
-        setProducts(prods.slice(0, 4)); // show only 4 like before
+        setProducts(prods.slice(0, 4));
       })
       .catch(() => console.log("Best sellers fetch failed ❌"));
   }, []);
+
+  const isLoggedIn = () => {
+    if (typeof window === "undefined") return false;
+    return !!localStorage.getItem("token");
+  };
 
   return (
     <div className="px-4 mt-10 space-y-4">
@@ -38,9 +46,6 @@ export default function BestSellers() {
       {/* Grid */}
       <div className="grid grid-cols-2 gap-4">
         {products.map((item) => {
-          const randomRating = (Math.random() * (5 - 3.5) + 3.5).toFixed(1);
-          const randomCount = Math.floor(Math.random() * 500);
-
           return (
             <Link key={item._id} href={`/details/${item._id}`}>
               <div className="bg-white rounded-2xl shadow-sm border overflow-hidden cursor-pointer">
@@ -59,8 +64,26 @@ export default function BestSellers() {
                     {item.productSellingCategory || "Fresh"}
                   </span>
 
-                  {/* Cart icon */}
-                  <div className="absolute top-2 right-2 bg-white p-2 rounded-full shadow">
+                  {/* Cart icon (UPDATED 🔥) */}
+                  <div
+                    onClick={(e) => {
+                      e.preventDefault();
+
+                      if (!isLoggedIn()) {
+                        setOpenLogin(true);
+                        return;
+                      }
+
+                      addToCart({
+                        ...item,
+                        id: item._id,
+                        availableQty: item.quantity, // 🔥 ADD THIS
+                      });
+                      setAdded(true);
+                      setTimeout(() => setAdded(false), 1500);
+                    }}
+                    className="absolute top-2 right-2 bg-white p-2 rounded-full shadow cursor-pointer"
+                  >
                     <ShoppingCart className="w-4 h-4 text-gray-700" />
                   </div>
                 </div>
@@ -75,12 +98,12 @@ export default function BestSellers() {
                     {item.quantity || 1} unit
                   </p>
 
-                  {/* Rating (random) */}
+                  {/* Static Rating (no random ❌ hydration safe) */}
                   <div className="flex items-center gap-1 text-orange-400 text-xs">
                     {[...Array(5)].map((_, i) => (
                       <Star key={i} className="w-3 h-3 fill-orange-400" />
                     ))}
-                    <span className="text-gray-500 ml-1">({randomCount})</span>
+                    <span className="text-gray-500 ml-1">(120)</span>
                   </div>
 
                   {/* Price */}
@@ -95,15 +118,6 @@ export default function BestSellers() {
                         ₹{item.price}
                       </p>
                     </div>
-
-                    {/* Add button */}
-                    <button
-                      onClick={(e) => e.preventDefault()}
-                      className="border rounded-lg px-2 py-1 text-lg text-orange-500"
-                    >
-                      {" "}
-                      +
-                    </button>
                   </div>
                 </div>
               </div>
@@ -111,6 +125,14 @@ export default function BestSellers() {
           );
         })}
       </div>
+
+      {/* Modal */}
+      <LoginModal isOpen={openLogin} onClose={() => setOpenLogin(false)} />
+      {added && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-black text-white px-6 py-2 rounded-full text-sm z-[2000]">
+          Added to cart
+        </div>
+      )}
     </div>
   );
 }

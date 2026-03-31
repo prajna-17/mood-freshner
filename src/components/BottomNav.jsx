@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Home, ShoppingCart, Store, User } from "lucide-react";
-
+import { useEffect, useState } from "react";
+import { getCart } from "@/utils/cart";
 const NAV_ITEMS = [
   { label: "Home", href: "/", icon: Home },
   { label: "Cart", href: "/cart", icon: ShoppingCart },
@@ -13,7 +14,23 @@ const NAV_ITEMS = [
 
 export default function BottomNav() {
   const pathname = usePathname();
+  const [count, setCount] = useState(0);
 
+  useEffect(() => {
+    const updateCount = () => {
+      const cart = getCart();
+      const total = cart.reduce((sum, item) => sum + item.qty, 0);
+      setCount(total);
+    };
+
+    updateCount(); // initial
+
+    window.addEventListener("cart-updated", updateCount);
+
+    return () => {
+      window.removeEventListener("cart-updated", updateCount);
+    };
+  }, []);
   return (
     <>
       <div style={{ height: 80 }} />
@@ -37,6 +54,12 @@ export default function BottomNav() {
                 className="flex-1 flex justify-center items-center relative"
                 style={{ height: "100%" }}
               >
+                {/* 🔥 CART BADGE */}
+                {href === "/cart" && count > 0 && (
+                  <span className="absolute top-1 right-[30%] bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full z-[5]">
+                    {count}
+                  </span>
+                )}
                 {active && (
                   <>
                     {/* SVG smooth concave notch */}

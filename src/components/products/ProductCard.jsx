@@ -3,7 +3,17 @@
 import Image from "next/image";
 import { Heart, Star, Plus } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
+import { addToCart } from "@/utils/cart";
+import LoginModal from "@/components/LoginModal";
 export default function ProductCard({ item }) {
+  const [openLogin, setOpenLogin] = useState(false);
+  const [added, setAdded] = useState(false);
+
+  const isLoggedIn = () => {
+    if (typeof window === "undefined") return false;
+    return !!localStorage.getItem("token");
+  };
   return (
     <Link href={`/details/${item._id}`}>
       <div className="bg-white rounded-3xl gap-3 shadow-md overflow-hidden border border-gray-100 w-full cursor-pointer">
@@ -16,9 +26,9 @@ export default function ProductCard({ item }) {
           </span>
 
           {/* Heart */}
-          <button className="absolute top-3 right-3 z-10 bg-white p-1.5 rounded-full shadow-sm hover:scale-110 transition-transform">
+          {/* <button className="absolute top-3 right-3 z-10 bg-white p-1.5 rounded-full shadow-sm hover:scale-110 transition-transform">
             <Heart size={13} className="text-gray-400" />
-          </button>
+          </button> */}
 
           {/* Image */}
           <Image
@@ -76,11 +86,36 @@ export default function ProductCard({ item }) {
             </div>
 
             {/* Add Button */}
-            <button className="bg-orange-500 hover:bg-orange-600 active:scale-95 transition-all text-white w-9 h-9 flex items-center justify-center rounded-xl shadow-md shadow-orange-200">
+            <button
+              onClick={(e) => {
+                e.preventDefault(); // 🔥 stop navigation
+
+                if (!isLoggedIn()) {
+                  setOpenLogin(true);
+                  return;
+                }
+
+                addToCart({
+                  ...item,
+                  id: item._id,
+                  availableQty: item.quantity, // 🔥 for stock check
+                });
+
+                setAdded(true);
+                setTimeout(() => setAdded(false), 1500);
+              }}
+              className="bg-orange-500 hover:bg-orange-600 active:scale-95 transition-all text-white w-9 h-9 flex items-center justify-center rounded-xl shadow-md shadow-orange-200"
+            >
               <Plus size={16} strokeWidth={2.5} />
             </button>
           </div>
         </div>
+        <LoginModal isOpen={openLogin} onClose={() => setOpenLogin(false)} />
+        {added && (
+          <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-black text-white px-6 py-2 rounded-full text-sm z-[2000]">
+            Added to cart
+          </div>
+        )}
       </div>
     </Link>
   );

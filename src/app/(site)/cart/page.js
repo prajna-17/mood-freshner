@@ -12,7 +12,7 @@ export default function CartPage() {
     <div className="bg-white min-h-screen">
       <CartHeader />
       <CartList />
-      <DeliveryCard />
+      {/* <DeliveryCard /> */}
       <CouponCard />
       <OrderSummary />
       <TrustSection />

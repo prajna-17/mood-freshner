@@ -2,8 +2,9 @@
 
 import Image from "next/image";
 import { Trash2, Star, Truck } from "lucide-react";
-
+import { updateQty, removeFromCart } from "@/utils/cart";
 export default function CartItemCard({ item }) {
+  const isAvailable = item.qty <= item.availableQty;
   return (
     <div className="bg-white rounded-2xl border border-[#e3e8f2] overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.08)] mb-4">
       {/* TOP CONTENT */}
@@ -16,7 +17,7 @@ export default function CartItemCard({ item }) {
           </span>
 
           <Image
-            src={item.img}
+            src={item.image}
             alt="milk"
             width={60}
             height={70}
@@ -29,14 +30,16 @@ export default function CartItemCard({ item }) {
           {/* Title + Delete */}
           <div className="flex justify-between">
             <h3 className="text-sm font-semibold text-gray-800 leading-tight">
-              Premium <br /> Full Cream Milk
+              {item.title}{" "}
             </h3>
-
-            <Trash2 size={18} className="text-gray-400" />
+            <Trash2
+              size={18}
+              className="text-gray-400 cursor-pointer"
+              onClick={() => removeFromCart(item.variantId)}
+            />{" "}
           </div>
 
-          <p className="text-sm text-gray-600 mt-1">1 Litre</p>
-
+          <span className="text-gray-800 font-medium">{item.qty}</span>
           {/* Stars */}
           <div className="flex gap-1 mt-1">
             {[...Array(5)].map((_, i) => (
@@ -51,10 +54,12 @@ export default function CartItemCard({ item }) {
           {/* Price */}
           <div className="flex items-center gap-2 mt-2">
             <p className="text-sm text-gray-400">
-              MRP <span className="line-through ml-1">₹ 98</span>
+              MRP <span className="line-through ml-1">₹ {item.oldPrice}</span>
             </p>
 
-            <p className="text-lg font-semibold text-gray-800">₹ 68</p>
+            <p className="text-lg font-semibold text-gray-800">
+              ₹ {item.price}
+            </p>
 
             <span className="bg-green-100 text-green-600 text-xs px-2 py-1 rounded-full">
               20% off
@@ -67,10 +72,33 @@ export default function CartItemCard({ item }) {
       <div className="px-4 pb-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center border border-[#cfd8ea] rounded-lg px-3 py-1 gap-6 text-lg">
-            <button className="text-gray-600">−</button>
-            <span className="text-gray-800 font-medium">2</span>
-            <button className="text-gray-600">+</button>
+            <button
+              onClick={() =>
+                item.qty > 1
+                  ? updateQty(item.variantId, item.qty - 1)
+                  : removeFromCart(item.variantId)
+              }
+            >
+              −
+            </button>
+
+            <span className="text-gray-800 font-medium">{item.qty}</span>
+
+            <button onClick={() => updateQty(item.variantId, item.qty + 1)}>
+              +
+            </button>
           </div>
+
+          {/* 🔥 STOCK STATUS */}
+          <span
+            className={`text-xs font-medium ${
+              isAvailable ? "text-green-600" : "text-red-500"
+            }`}
+          >
+            {isAvailable
+              ? `In Stock (${item.availableQty} available)`
+              : `Only ${item.availableQty} available`}
+          </span>
         </div>
       </div>
 

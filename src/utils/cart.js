@@ -37,8 +37,7 @@ export const addToCart = (product) => {
   } else {
     cart.push({
       variantId,
-
-      productId: product.productId || product.id, // 🔥 REQUIRED FIX
+      productId: product.productId || product.id,
 
       title: product.title,
       image: product.image || product.images?.[0],
@@ -51,6 +50,8 @@ export const addToCart = (product) => {
       size: product.size,
 
       qty: 1,
+
+      availableQty: product.availableQty || product.quantity || 0, // 🔥 ADD
     });
   }
 
