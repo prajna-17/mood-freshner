@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { getCart, clearCart } from "@/utils/cart";
 import { getUserIdFromToken } from "@/utils/auth";
-
+import { Suspense } from "react";
 const DELIVERY_FEE = 99;
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
 
@@ -162,7 +162,7 @@ function AddressModal({ initial, onSave, onClose }) {
 }
 
 // ─── Main Checkout Page ───────────────────────────────────────────────────────
-export default function CheckoutPage() {
+function CheckoutContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -653,5 +653,12 @@ export default function CheckoutPage() {
         />
       )}
     </div>
+  );
+}
+export default function CheckoutPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <CheckoutContent />
+    </Suspense>
   );
 }
