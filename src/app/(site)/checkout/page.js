@@ -5,7 +5,7 @@ import { getCart, clearCart } from "@/utils/cart";
 import { getUserIdFromToken } from "@/utils/auth";
 import { Suspense } from "react";
 const DELIVERY_FEE = 99;
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+const API_BASE = "https://mood-freshner-backend.onrender.com/api";
 console.log("API_BASE:", API_BASE);
 // ─── Address helpers (per-user, localStorage) ────────────────────────────────
 const getAddressKey = () => {
