@@ -21,8 +21,7 @@ import {
 import { getUserIdFromToken } from "@/utils/auth";
 import { useRouter } from "next/navigation";
 import { Suspense } from "react";
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
-
+const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 // ─── Status → tracker step index ─────────────────────────────────────────────
 const STATUS_INDEX = {
   PLACED: 0,
