@@ -332,7 +332,7 @@ export default function ProfilePage() {
       sub: "Manage your alerts",
       iconBg: "#fff1f2",
       iconColor: "#f43f5e",
-      href: "/profile/notifications",
+      href: "/notifications",
     },
     {
       Icon: Settings,
