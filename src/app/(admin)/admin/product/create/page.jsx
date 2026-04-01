@@ -33,6 +33,7 @@ export default function AdminCreateProduct() {
   const [categoryId, setCategoryId] = useState("");
   const [sellingCategory, setSellingCategory] = useState("featured");
   const [inStock, setInStock] = useState(true);
+  const [pincodes, setPincodes] = useState("");
   const mainFileRef = React.useRef(null);
   const colorFileRef = React.useRef(null);
 
@@ -142,7 +143,10 @@ export default function AdminCreateProduct() {
       colors: colors.split(",").map((s) => s.trim()),
       category: categoryId,
       subCategory: subCategoryId,
-
+      availablePincodes: pincodes
+        .split(",")
+        .map((p) => p.trim())
+        .filter(Boolean),
       productSellingCategory: sellingCategory,
       inStock,
     };
@@ -251,6 +255,12 @@ export default function AdminCreateProduct() {
             </option>
           ))}
         </select>
+        <input
+          className="modal-input"
+          placeholder="Available Pincodes (560001,560002)"
+          value={pincodes}
+          onChange={(e) => setPincodes(e.target.value)}
+        />
 
         <select
           className="modal-input"

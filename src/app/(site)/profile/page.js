@@ -262,11 +262,17 @@ export default function ProfilePage() {
   // ── Save address — persists to localStorage, updates state ───────────────
   const handleSaveAddress = (newAddr) => {
     const userId = getUserIdFromToken();
-    if (userId)
+
+    if (userId) {
       localStorage.setItem(`address_${userId}`, JSON.stringify(newAddr));
+    }
+
+    // 🔥 SYNC GLOBAL PINCODE
+    localStorage.setItem("pincode", newAddr.postalCode);
+
     setAddress(newAddr);
     setShowAddressModal(false);
-    // Broadcast so DeliveryCard and checkout pick up change
+
     window.dispatchEvent(new Event("addressUpdated"));
   };
 

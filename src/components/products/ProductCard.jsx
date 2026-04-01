@@ -98,7 +98,8 @@ export default function ProductCard({ item }) {
                 addToCart({
                   ...item,
                   id: item._id,
-                  availableQty: item.quantity, // 🔥 for stock check
+                  availableQty: item.quantity,
+                  availablePincodes: item.availablePincodes, // 🔥 for stock check
                 });
 
                 setAdded(true);

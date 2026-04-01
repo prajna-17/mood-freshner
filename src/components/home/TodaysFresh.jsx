@@ -10,7 +10,10 @@ export default function TodaysFresh() {
   const [items, setItems] = useState([]);
 
   useEffect(() => {
-    fetch(`${API}/products`)
+    const pincode = localStorage.getItem("pincode");
+    if (!pincode) return;
+
+    fetch(`${API}/products?pincode=${pincode}`)
       .then((r) => r.json())
       .then((data) => {
         const prods = Array.isArray(data) ? data : data.data || [];

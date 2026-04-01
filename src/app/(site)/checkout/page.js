@@ -197,6 +197,19 @@ function CheckoutContent() {
   // ── Place Order ─────────────────────────────────────────────────────────────
   const handlePlaceOrder = async () => {
     if (!address) return;
+    // 🔥 VALIDATE PINCODE BEFORE ORDER
+    const userPincode = address?.postalCode;
+
+    const invalidItems = cartItems.filter(
+      (item) =>
+        !item.availablePincodes ||
+        !item.availablePincodes.includes(userPincode),
+    );
+
+    if (invalidItems.length > 0) {
+      setOrderError(`"${invalidItems[0].title}" is not available in your area`);
+      return;
+    }
     setPlacing(true);
     setOrderError("");
 

@@ -10,15 +10,16 @@ export default function YouCanAlsoTry({ product }) {
   useEffect(() => {
     if (!product) return;
 
-    fetch(`${API}/products`)
+    const pincode = localStorage.getItem("pincode");
+    if (!pincode) return;
+
+    fetch(`${API}/products?pincode=${pincode}`)
       .then((r) => r.json())
       .then((data) => {
         let prods = Array.isArray(data) ? data : data.data || [];
 
-        // ❌ remove current product
         prods = prods.filter((p) => p._id !== product._id);
 
-        // 👉 shuffle (optional)
         prods = prods.sort(() => 0.5 - Math.random());
 
         setItems(prods.slice(0, 6));

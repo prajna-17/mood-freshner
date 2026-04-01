@@ -10,15 +10,17 @@ export default function YouMayLike() {
   const [items, setItems] = useState([]);
 
   useEffect(() => {
-    fetch(`${API}/products`)
+    const pincode = localStorage.getItem("pincode");
+    if (!pincode) return;
+
+    fetch(`${API}/products?pincode=${pincode}`)
       .then((r) => r.json())
       .then((data) => {
         const prods = Array.isArray(data) ? data : data.data || [];
 
-        // 👉 shuffle (random products)
         const shuffled = prods.sort(() => 0.5 - Math.random());
 
-        setItems(shuffled.slice(0, 5)); // show few items
+        setItems(shuffled.slice(0, 5));
       })
       .catch(() => console.log("You may like fetch failed ❌"));
   }, []);

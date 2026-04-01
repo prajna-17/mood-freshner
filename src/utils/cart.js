@@ -51,7 +51,10 @@ export const addToCart = (product) => {
 
       qty: 1,
 
-      availableQty: product.availableQty || product.quantity || 0, // 🔥 ADD
+      availableQty: product.availableQty || product.quantity || 0,
+
+      // 🔥 ADD THIS LINE
+      availablePincodes: product.availablePincodes || [],
     });
   }
 

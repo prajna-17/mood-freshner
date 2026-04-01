@@ -21,12 +21,14 @@ export default function ProductsGrid({ setProducts: setParentProducts }) {
 
   const fetchProducts = async () => {
     try {
-      let url = `${API}/products`;
+      const pincode = localStorage.getItem("pincode");
+      if (!pincode) return;
 
+      let url = `${API}/products?pincode=${pincode}`;
       if (categoryId && subCategoryId) {
-        url += `?category=${categoryId}&subCategory=${subCategoryId}`;
+        url += `&category=${categoryId}&subCategory=${subCategoryId}`;
       } else if (categoryId) {
-        url += `?category=${categoryId}`;
+        url += `&category=${categoryId}`;
       }
 
       const res = await fetch(url);

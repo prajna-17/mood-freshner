@@ -165,11 +165,21 @@ export default function DeliveryCard() {
 
   const handleSaveAddress = (newAddr) => {
     const userId = getUserIdFromToken();
-    if (userId)
+
+    if (userId) {
       localStorage.setItem(`address_${userId}`, JSON.stringify(newAddr));
+    }
+
+    // 🔥 IMPORTANT: sync pincode
+    localStorage.setItem("pincode", newAddr.postalCode);
+
     setAddress(newAddr);
     setShowAddressModal(false);
+
     window.dispatchEvent(new Event("addressUpdated"));
+
+    // 🔥 refresh products
+    window.location.reload();
   };
 
   return (

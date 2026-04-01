@@ -12,20 +12,22 @@ export default function RelatedProducts({ product }) {
   useEffect(() => {
     if (!product?.category) return;
 
+    const pincode = localStorage.getItem("pincode");
+    if (!pincode) return;
+
     const categoryId =
       typeof product.category === "object"
         ? product.category._id
         : product.category;
 
-    fetch(`${API}/products?category=${categoryId}`)
+    fetch(`${API}/products?category=${categoryId}&pincode=${pincode}`)
       .then((r) => r.json())
       .then((data) => {
         let prods = Array.isArray(data) ? data : data.data || [];
 
-        // ❌ always remove current product
         prods = prods.filter((p) => p._id !== product._id);
 
-        setItems(prods); // no slice restriction here (optional later)
+        setItems(prods);
       })
       .catch(() => console.log("Related products fetch failed ❌"));
   }, [product]);

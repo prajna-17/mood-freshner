@@ -13,7 +13,12 @@ export default function BestSellers() {
   const [added, setAdded] = useState(false);
 
   useEffect(() => {
-    fetch(`${API}/products?productSellingCategory=best-selling`)
+    const pincode = localStorage.getItem("pincode");
+    if (!pincode) return;
+
+    fetch(
+      `${API}/products?productSellingCategory=best-selling&pincode=${pincode}`,
+    )
       .then((r) => r.json())
       .then((data) => {
         const prods = Array.isArray(data) ? data : data.data || [];
@@ -77,7 +82,8 @@ export default function BestSellers() {
                       addToCart({
                         ...item,
                         id: item._id,
-                        availableQty: item.quantity, // 🔥 ADD THIS
+                        availableQty: item.quantity,
+                        availablePincodes: item.availablePincodes, // 🔥 ADD THIS
                       });
                       setAdded(true);
                       setTimeout(() => setAdded(false), 1500);

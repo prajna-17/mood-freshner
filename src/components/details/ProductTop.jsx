@@ -123,6 +123,7 @@ export default function ProductTop({ product }) {
       ...product,
       id: product._id,
       availableQty: product.quantity,
+      availablePincodes: item.availablePincodes,
     });
 
     setAdded(true);
@@ -145,6 +146,7 @@ export default function ProductTop({ product }) {
         qty: qty, // 🔥 VERY IMPORTANT (use selected qty)
         image: product.images?.[0],
         availableQty: product.quantity,
+        availablePincodes: item.availablePincodes,
       }),
     );
 

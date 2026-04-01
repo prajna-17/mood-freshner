@@ -39,7 +39,7 @@ export default function EditProductPage() {
 
   const [superCategoryId, setSuperCategoryId] = useState("");
   const [subCategoryId, setSubCategoryId] = useState("");
-
+  const [pincodes, setPincodes] = useState("");
   const mainFileRef = React.useRef(null);
   const colorFileRef = React.useRef(null);
 
@@ -62,6 +62,7 @@ export default function EditProductPage() {
     setSizes(data.sizes.join(","));
     setColors(data.colors.join(","));
     setCategoryId(data.category?._id || "");
+    setPincodes((data.availablePincodes || []).join(","));
     setSellingCategory(data.productSellingCategory);
     setInStock(data.inStock);
 
@@ -145,6 +146,10 @@ export default function EditProductPage() {
       sizes: sizes.split(",").map((x) => x.trim()),
       colors: colors.split(",").map((x) => x.trim()),
       category: categoryId,
+      availablePincodes: pincodes
+        .split(",")
+        .map((p) => p.trim())
+        .filter(Boolean),
       productSellingCategory: sellingCategory,
       inStock,
     };
@@ -294,6 +299,12 @@ export default function EditProductPage() {
           value={oldPrice}
           onChange={(e) => setOldPrice(e.target.value)}
           placeholder="Old Price"
+        />
+        <input
+          className="modal-input"
+          placeholder="Available Pincodes (560001,560002)"
+          value={pincodes}
+          onChange={(e) => setPincodes(e.target.value)}
         />
         <input
           className="modal-input"
