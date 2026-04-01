@@ -128,7 +128,7 @@ export default function Header() {
           {/* ── Left: Logo ── */}
           <div className="hdr-logo">
             <Image
-              src="/img/logo1.png"
+              src="/img/logo7.png"
               alt="MoodFresh"
               width={scrolled ? 120 : 140}
               height={scrolled ? 34 : 38}

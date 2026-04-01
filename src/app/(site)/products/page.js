@@ -13,7 +13,7 @@ export default function ProductsPage() {
 
   return (
     <div className="bg-white min-h-screen">
-      <HeaderSection />
+      {/* <HeaderSection /> */}
 
       <Suspense fallback={<div>Loading tabs...</div>}>
         <CategoryTabs />

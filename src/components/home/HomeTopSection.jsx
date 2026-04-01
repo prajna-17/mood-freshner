@@ -2,7 +2,7 @@
 
 import { ShoppingCart, Bell, Search, Mic } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { getCart } from "@/utils/cart";
 
 const API_BASE = "https://mood-freshner-backend.onrender.com/api";
@@ -12,6 +12,9 @@ export default function HomeTopSection() {
   const [cartCount, setCartCount] = useState(0);
   const [user, setUser] = useState(null);
   const [notifCount, setNotifCount] = useState(0);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [listening, setListening] = useState(false);
+  const recognitionRef = useRef(null);
 
   useEffect(() => {
     const updateCount = () => {
@@ -31,7 +34,6 @@ export default function HomeTopSection() {
     }
   }, []);
 
-  // Fetch notification count for badge
   useEffect(() => {
     const fetchCount = async () => {
       try {
@@ -45,6 +47,54 @@ export default function HomeTopSection() {
     };
     fetchCount();
   }, []);
+
+  // ── Search submit ──────────────────────────────────────────────────────────
+  const handleSearch = (query) => {
+    const q = (query || searchQuery).trim();
+    if (!q) return;
+    router.push(`/products?search=${encodeURIComponent(q)}`);
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") handleSearch();
+  };
+
+  // ── Mic (Web Speech API) ───────────────────────────────────────────────────
+  const handleMic = () => {
+    const SpeechRecognition =
+      window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+      alert("Voice search is not supported in this browser.");
+      return;
+    }
+
+    if (listening) {
+      recognitionRef.current?.stop();
+      setListening(false);
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = "en-IN";
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+    recognitionRef.current = recognition;
+
+    recognition.onstart = () => setListening(true);
+
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      setSearchQuery(transcript);
+      setListening(false);
+      handleSearch(transcript);
+    };
+
+    recognition.onerror = () => setListening(false);
+    recognition.onend = () => setListening(false);
+
+    recognition.start();
+  };
 
   return (
     <div className="px-4 pt-4 space-y-4">
@@ -78,7 +128,7 @@ export default function HomeTopSection() {
             <ShoppingCart className="w-5 h-5 text-blue-700" />
           </div>
 
-          {/* Bell — navigates to /notifications */}
+          {/* Bell */}
           <div
             onClick={() => router.push("/notifications")}
             className="bg-blue-100 p-3 rounded-xl cursor-pointer relative"
@@ -94,14 +144,30 @@ export default function HomeTopSection() {
       </div>
 
       {/* Search Bar */}
-      <div className="flex items-center bg-blue-100 rounded-xl px-3 py-3">
-        <Search className="w-5 h-5 text-blue-600 mr-2" />
+      <div
+        className="flex items-center bg-blue-100 rounded-xl px-3 py-3"
+        style={{
+          outline: listening ? "2px solid #3b82f6" : "none",
+          transition: "outline 0.2s",
+        }}
+      >
+        <Search
+          className="w-5 h-5 text-blue-600 mr-2 cursor-pointer"
+          onClick={() => handleSearch()}
+        />
         <input
           type="text"
-          placeholder="Search milk, cheese, etc."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder={listening ? "Listening..." : "Search milk, cheese, etc."}
           className="bg-transparent outline-none flex-1 text-sm text-gray-700 placeholder:text-blue-400"
         />
-        <Mic className="w-5 h-5 text-blue-600" />
+        <Mic
+          className="w-5 h-5 cursor-pointer transition-colors"
+          style={{ color: listening ? "#ef4444" : "#2563eb" }}
+          onClick={handleMic}
+        />
       </div>
     </div>
   );

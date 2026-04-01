@@ -177,16 +177,14 @@ function CheckoutContent() {
 
   // On mount: load items + saved address
   useEffect(() => {
-    // "Buy Now" passes a single item as a query param: ?item=<base64-encoded-json>
-    const itemParam = searchParams.get("item");
-    if (itemParam) {
-      try {
-        const item = JSON.parse(atob(itemParam));
-        setCartItems([item]);
-      } catch {
-        setCartItems(getCart());
-      }
+    // 🔥 FIRST check Buy Now item from localStorage
+    const storedItem = localStorage.getItem("checkoutItem");
+
+    if (storedItem) {
+      setCartItems([JSON.parse(storedItem)]);
+      localStorage.removeItem("checkoutItem"); // optional cleanup
     } else {
+      // fallback → normal cart
       setCartItems(getCart());
     }
 
