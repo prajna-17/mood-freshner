@@ -70,6 +70,7 @@ export default function Footer() {
                     <li key={i}>
                       <Link
                         href={link.href}
+                        prefetch={false}
                         className="text-white/60 hover:text-white text-sm transition-all duration-200 hover:translate-x-1 inline-block group"
                       >
                         <span className="group-hover:text-[#f5c842] transition-colors">
