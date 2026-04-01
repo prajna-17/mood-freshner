@@ -21,8 +21,7 @@ import {
 import { getUserIdFromToken } from "@/utils/auth";
 import { useRouter } from "next/navigation";
 import { Suspense } from "react";
-const API_BASE = process.env.NEXT_PUBLIC_API_URL;
-// ─── Status → tracker step index ─────────────────────────────────────────────
+const API_BASE = "https://mood-freshner-backend.onrender.com/api"; // ─── Status → tracker step index ─────────────────────────────────────────────
 const STATUS_INDEX = {
   PLACED: 0,
   CONFIRMED: 1,
@@ -151,7 +150,15 @@ function OrderConfirmContent() {
         const res = await fetch(`${API_BASE}/orders/order-details/${orderId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        const data = await res.json();
+
+        const text = await res.text();
+
+        let data;
+        try {
+          data = JSON.parse(text);
+        } catch {
+          throw new Error("Invalid response from server");
+        }
         if (!res.ok) throw new Error(data.message || "Failed to fetch order");
         setOrder(data.data);
       } catch (err) {
