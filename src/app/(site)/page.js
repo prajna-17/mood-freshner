@@ -12,23 +12,87 @@ import FlashSale from "@/components/home/FlashSale";
 import OurStory from "@/components/home/OurStory";
 import RecentlyPurchased from "@/components/home/RecentlyPurchased";
 import WhyChoose from "@/components/home/WhyChoose";
-import PincodeModal from "@/components/PincodeModal";
+import { getUserIdFromToken } from "@/utils/auth"; // ✅ IMPORTANT
 
 export default function Home() {
-  const [showPincodeModal, setShowPincodeModal] = useState(false);
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    const pincode = localStorage.getItem("pincode");
+    const existingPin = localStorage.getItem("pincode");
 
-    if (!pincode) {
-      setShowPincodeModal(true);
+    // ✅ If already exists → just render
+    if (existingPin) {
+      setIsReady(true);
+      return;
     }
 
-    setIsReady(true); // ✅ important
+    // ✅ Auto detect location
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          try {
+            const { latitude, longitude } = position.coords;
+
+            const res = await fetch(
+              `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`,
+            );
+
+            const data = await res.json();
+
+            const pincode = data.postcode;
+
+            if (pincode) {
+              // ✅ Save pincode
+              localStorage.setItem("pincode", pincode);
+
+              // ✅ Create address object
+              const detectedAddress = {
+                fullName: "",
+                phone: "",
+                addressLine: "Your Location",
+                landmark: "",
+                city: data.city || data.locality,
+                state: data.principalSubdivision,
+                postalCode: pincode,
+              };
+
+              // ✅ Correct userId handling
+              const userId = getUserIdFromToken();
+
+              if (userId) {
+                localStorage.setItem(
+                  `address_${userId}`,
+                  JSON.stringify(detectedAddress),
+                );
+              } else {
+                localStorage.setItem(
+                  "address_guest",
+                  JSON.stringify(detectedAddress),
+                );
+              }
+
+              // ✅ Update UI instantly
+              window.dispatchEvent(new Event("addressUpdated"));
+            } else {
+              console.log("Pincode not found");
+            }
+          } catch (err) {
+            console.log("Error detecting location", err);
+          }
+
+          setIsReady(true);
+        },
+        (error) => {
+          console.log("Location denied", error);
+          setIsReady(true);
+        },
+      );
+    } else {
+      setIsReady(true);
+    }
   }, []);
 
-  // ⛔ prevent render before client loads
+  // ⛔ prevent SSR mismatch
   if (!isReady) return null;
 
   return (
@@ -44,15 +108,6 @@ export default function Home() {
       <OurStory />
       <RecentlyPurchased />
       <WhyChoose />
-
-      <PincodeModal
-        isOpen={showPincodeModal}
-        onSave={(pin) => {
-          localStorage.setItem("pincode", pin);
-          setShowPincodeModal(false);
-          window.location.reload();
-        }}
-      />
     </>
   );
 }

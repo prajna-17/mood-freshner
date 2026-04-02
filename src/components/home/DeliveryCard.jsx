@@ -133,9 +133,16 @@ export default function DeliveryCard() {
   // Load address from localStorage
   const loadAddress = () => {
     const userId = getUserIdFromToken();
-    if (!userId) return;
+
     try {
-      const addr = JSON.parse(localStorage.getItem(`address_${userId}`));
+      let addr;
+
+      if (userId) {
+        addr = JSON.parse(localStorage.getItem(`address_${userId}`));
+      } else {
+        addr = JSON.parse(localStorage.getItem("address_guest"));
+      }
+
       if (addr) setAddress(addr);
     } catch {}
   };
@@ -168,20 +175,18 @@ export default function DeliveryCard() {
 
     if (userId) {
       localStorage.setItem(`address_${userId}`, JSON.stringify(newAddr));
+    } else {
+      localStorage.setItem("address_guest", JSON.stringify(newAddr));
     }
 
-    // 🔥 IMPORTANT: sync pincode
     localStorage.setItem("pincode", newAddr.postalCode);
 
     setAddress(newAddr);
     setShowAddressModal(false);
 
     window.dispatchEvent(new Event("addressUpdated"));
-
-    // 🔥 refresh products
     window.location.reload();
   };
-
   return (
     <>
       <div className="px-4 mt-10">

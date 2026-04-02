@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { Home, ShoppingCart, Store, User } from "lucide-react";
 import { useEffect, useState } from "react";
 import { getCart } from "@/utils/cart";
+import LoginModal from "@/components/LoginModal";
 const NAV_ITEMS = [
   { label: "Home", href: "/", icon: Home },
   { label: "Cart", href: "/cart", icon: ShoppingCart },
@@ -15,7 +16,7 @@ const NAV_ITEMS = [
 export default function BottomNav() {
   const pathname = usePathname();
   const [count, setCount] = useState(0);
-
+  const [openLogin, setOpenLogin] = useState(false);
   useEffect(() => {
     const updateCount = () => {
       const cart = getCart();
@@ -31,6 +32,11 @@ export default function BottomNav() {
       window.removeEventListener("cart-updated", updateCount);
     };
   }, []);
+
+  const isLoggedIn = () => {
+    if (typeof window === "undefined") return false;
+    return !!localStorage.getItem("token");
+  };
   return (
     <>
       <div style={{ height: 80 }} />
@@ -51,6 +57,12 @@ export default function BottomNav() {
               <Link
                 key={href}
                 href={href}
+                onClick={(e) => {
+                  if (href === "/profile" && !isLoggedIn()) {
+                    e.preventDefault(); // ❌ stop navigation
+                    setOpenLogin(true); // ✅ open modal
+                  }
+                }}
                 className="flex-1 flex justify-center items-center relative"
                 style={{ height: "100%" }}
               >
@@ -105,6 +117,7 @@ export default function BottomNav() {
           })}
         </div>
       </nav>
+      <LoginModal isOpen={openLogin} onClose={() => setOpenLogin(false)} />
     </>
   );
 }

@@ -189,6 +189,16 @@ export default function ProfilePage() {
     }
 
     const userId = getUserIdFromToken();
+    // 🔥 COPY guest address → user address (IMPORTANT)
+    const guestAddr = localStorage.getItem("address_guest");
+
+    if (guestAddr && userId) {
+      const userAddrKey = `address_${userId}`;
+
+      if (!localStorage.getItem(userAddrKey)) {
+        localStorage.setItem(userAddrKey, guestAddr);
+      }
+    }
     if (!userId) {
       router.push("/login");
       return;
@@ -258,7 +268,6 @@ export default function ProfilePage() {
     };
     fetchOrders().finally(() => setLoading(false));
   }, []);
-
   // ── Save address — persists to localStorage, updates state ───────────────
   const handleSaveAddress = (newAddr) => {
     const userId = getUserIdFromToken();

@@ -10,7 +10,7 @@ console.log("API_BASE:", API_BASE);
 // ─── Address helpers (per-user, localStorage) ────────────────────────────────
 const getAddressKey = () => {
   const userId = getUserIdFromToken();
-  return userId ? `address_${userId}` : null;
+  return userId ? `address_${userId}` : "address_guest";
 };
 
 const getSavedAddress = () => {
@@ -65,6 +65,8 @@ function AddressModal({ initial, onSave, onClose }) {
       return;
     }
     saveAddressToStorage(form);
+    localStorage.setItem("pincode", form.postalCode);
+    window.dispatchEvent(new Event("addressUpdated"));
     onSave(form);
   };
 
