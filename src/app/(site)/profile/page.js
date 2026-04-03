@@ -298,10 +298,31 @@ export default function ProfilePage() {
   };
   // ── Logout ───────────────────────────────────────────────────────────────
   const handleLogout = () => {
+    const userId = getUserIdFromToken();
+
+    // ✅ Remove auth
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-    // address_<userId> and cart stay for re-login
-    router.push("/login");
+
+    // ✅ Remove cart (VERY IMPORTANT)
+    if (userId) {
+      localStorage.removeItem(`cart_${userId}`);
+    }
+    localStorage.removeItem("cart_guest");
+
+    // ✅ Optional: remove address (if you want clean state)
+    if (userId) {
+      localStorage.removeItem(`address_${userId}`);
+    }
+
+    // ✅ Optional: remove pincode
+    localStorage.removeItem("pincode");
+
+    // ✅ Refresh global UI (important for navbar/cart)
+    window.dispatchEvent(new Event("storage"));
+
+    // ✅ Redirect to HOME (not login)
+    router.push("/");
   };
 
   // ── Derived ──────────────────────────────────────────────────────────────
