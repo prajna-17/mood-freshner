@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { API } from "@/utils/api";
-
+import { GoogleLogin } from "@react-oauth/google";
 export default function LoginModal({ isOpen, onClose }) {
   // `visible` controls whether the DOM node exists
   // `show` controls the CSS transition (slide + fade)
@@ -216,6 +216,29 @@ export default function LoginModal({ isOpen, onClose }) {
               </button>
             </div>
           )}
+          <GoogleLogin
+            onSuccess={async (credentialResponse) => {
+              const res = await fetch(`${API}/auth/google`, {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  credential: credentialResponse.credential,
+                }),
+              });
+
+              const data = await res.json();
+
+              localStorage.setItem("token", data.token);
+              localStorage.setItem("user", JSON.stringify(data));
+
+              onClose();
+            }}
+            onError={() => {
+              console.log("Login Failed");
+            }}
+          />
 
           {/* ── Step 2 ── */}
           {step === 2 && (
