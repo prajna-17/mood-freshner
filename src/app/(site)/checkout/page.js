@@ -176,7 +176,7 @@ function CheckoutContent() {
   const [address, setAddress] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [orderError, setOrderError] = useState("");
-
+  const [discount, setDiscount] = useState(0);
   // On mount: load items + saved address
   useEffect(() => {
     // 🔥 FIRST check Buy Now item from localStorage
@@ -191,11 +191,16 @@ function CheckoutContent() {
     }
 
     setAddress(getSavedAddress());
+    const coupon = JSON.parse(localStorage.getItem("coupon"));
+    if (coupon) {
+      setDiscount(coupon.discount);
+    }
   }, []);
 
   const subtotal = cartItems.reduce((s, i) => s + i.price * i.qty, 0);
-  const total = subtotal + DELIVERY_FEE;
+  const discountAmount = Math.round((subtotal * discount) / 100);
 
+  const total = subtotal - discountAmount + DELIVERY_FEE;
   // ── Place Order ─────────────────────────────────────────────────────────────
   const handlePlaceOrder = async () => {
     if (!address) return;
@@ -448,6 +453,12 @@ function CheckoutContent() {
                 ₹{DELIVERY_FEE}
               </span>
             </div>
+            {discount > 0 && (
+              <div className="flex justify-between text-sm text-green-600">
+                <span>Coupon ({discount}%)</span>
+                <span>-₹{discountAmount}</span>
+              </div>
+            )}
             <div className="flex justify-between text-base font-bold text-sky-800 pt-2 border-t border-sky-50">
               <span>Total</span>
               <span className="text-sky-600">₹{total.toLocaleString()}</span>

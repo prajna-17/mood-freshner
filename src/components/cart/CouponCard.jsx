@@ -1,8 +1,16 @@
 "use client";
 
 import { BadgePercent, Scissors } from "lucide-react";
-
+import { getCart } from "@/utils/cart";
+import { useState, useEffect } from "react";
 export default function CouponCard() {
+  const [applied, setApplied] = useState(false);
+  const [hasItems, setHasItems] = useState(false);
+
+  useEffect(() => {
+    const cart = getCart();
+    setHasItems(cart.length > 0);
+  }, []);
   return (
     <div className="px-4 mt-10">
       <div className="relative bg-[#fff7ed] rounded-2xl p-4 border-2 border-dashed border-orange-300">
@@ -30,8 +38,34 @@ export default function CouponCard() {
           </div>
 
           {/* RIGHT BUTTON */}
-          <button className="border border-[#2f6fb3] text-[#2f6fb3] px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap">
-            APPLY COUPON
+          <button
+            onClick={() => {
+              if (!hasItems) return;
+
+              localStorage.setItem(
+                "coupon",
+                JSON.stringify({
+                  code: "ABD15",
+                  discount: 10,
+                }),
+              );
+
+              setApplied(true);
+
+              // 🔥 notify other components
+              window.dispatchEvent(new Event("coupon-applied"));
+            }}
+            disabled={!hasItems || applied}
+            className={`px-4 py-2 rounded-lg text-sm font-medium
+    ${
+      !hasItems
+        ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+        : applied
+          ? "bg-green-100 text-green-600"
+          : "border border-[#2f6fb3] text-[#2f6fb3]"
+    }`}
+          >
+            {!hasItems ? "No Items" : applied ? "Applied ✓" : "APPLY COUPON"}
           </button>
         </div>
       </div>

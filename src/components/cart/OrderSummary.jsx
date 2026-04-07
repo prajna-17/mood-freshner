@@ -28,9 +28,16 @@ export default function OrderSummary() {
         }
       });
 
-      const gst = Math.round(subtotal * 0.05); // 5% GST
-      const total = subtotal + gst;
-      const savings = discount;
+      const coupon = JSON.parse(localStorage.getItem("coupon"));
+      const couponDiscount = coupon ? coupon.discount : 0;
+
+      const couponAmount = Math.round((subtotal * couponDiscount) / 100);
+
+      const gst = Math.round((subtotal - couponAmount) * 0.05);
+
+      const total = subtotal - couponAmount + gst;
+
+      const savings = discount + couponAmount;
 
       setSummary({
         subtotal,
@@ -38,6 +45,7 @@ export default function OrderSummary() {
         gst,
         total,
         savings,
+        couponAmount,
       });
     };
 
@@ -45,8 +53,14 @@ export default function OrderSummary() {
 
     window.addEventListener("cart-updated", calculate);
 
+    // ADD THIS LINE EXACTLY HERE
+    window.addEventListener("coupon-applied", calculate);
+
     return () => {
       window.removeEventListener("cart-updated", calculate);
+
+      // ADD THIS ALSO
+      window.removeEventListener("coupon-applied", calculate);
     };
   }, []);
 
@@ -71,6 +85,13 @@ export default function OrderSummary() {
           <span>Product Discount</span>
           <span className="text-green-500">- ₹ {summary.discount}</span>
         </div>
+
+        {summary.couponAmount > 0 && (
+          <div className="flex justify-between text-green-600">
+            <span>Coupon Discount</span>
+            <span>- ₹ {summary.couponAmount}</span>
+          </div>
+        )}
 
         <div className="flex justify-between text-gray-700">
           <span>Delivery Charge</span>
