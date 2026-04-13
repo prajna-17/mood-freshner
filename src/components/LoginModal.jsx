@@ -214,9 +214,40 @@ export default function LoginModal({ isOpen, onClose }) {
                   "Send OTP"
                 )}
               </button>
+              {/* Divider */}
+              <div className="flex items-center gap-3 my-2">
+                <div className="flex-1 h-[1px] bg-gray-200" />
+                <span className="text-xs text-gray-400">OR</span>
+                <div className="flex-1 h-[1px] bg-gray-200" />
+              </div>
+
+              {/* Google Login */}
+              <div className="w-full flex justify-center">
+                <div className="scale-[1.05]">
+                  <GoogleLogin
+                    onSuccess={async (credentialResponse) => {
+                      const res = await fetch(`${API}/auth/google`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                          credential: credentialResponse.credential,
+                        }),
+                      });
+
+                      const data = await res.json();
+                      localStorage.setItem("token", data.token);
+                      localStorage.setItem("user", JSON.stringify(data));
+                      onClose();
+                    }}
+                    onError={() => {
+                      console.log("Login Failed");
+                    }}
+                  />
+                </div>
+              </div>
             </div>
           )}
-          <GoogleLogin
+          {/* <GoogleLogin
             onSuccess={async (credentialResponse) => {
               const res = await fetch(`${API}/auth/google`, {
                 method: "POST",
@@ -235,10 +266,10 @@ export default function LoginModal({ isOpen, onClose }) {
 
               onClose();
             }}
-            onError={() => {
+            onError={() =
               console.log("Login Failed");
             }}
-          />
+          /> */}
 
           {/* ── Step 2 ── */}
           {step === 2 && (
