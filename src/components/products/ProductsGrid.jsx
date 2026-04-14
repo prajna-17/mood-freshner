@@ -8,23 +8,21 @@ import { ShoppingBasket, SearchX, Frown } from "lucide-react";
 
 export default function ProductsGrid({ setProducts: setParentProducts }) {
   const [products, setProducts] = useState([]);
-  const [visibleCount, setVisibleCount] = useState(8); // 👈 for show more
+  const [visibleCount, setVisibleCount] = useState(8);
 
   const searchParams = useSearchParams();
-
   const categoryId = searchParams.get("category");
   const subCategoryId = searchParams.get("subCategory");
-
-  useEffect(() => {
-    fetchProducts();
-  }, [categoryId, subCategoryId]);
 
   const fetchProducts = async () => {
     try {
       const pincode = localStorage.getItem("pincode");
-      if (!pincode) return;
 
-      let url = `${API}/products?pincode=${pincode}`;
+      // 🔥 No pincode → fetch all (no pincode filter)
+      let url = pincode
+        ? `${API}/products?pincode=${pincode}`
+        : `${API}/products`;
+
       if (categoryId && subCategoryId) {
         url += `&category=${categoryId}&subCategory=${subCategoryId}`;
       } else if (categoryId) {
@@ -33,31 +31,29 @@ export default function ProductsGrid({ setProducts: setParentProducts }) {
 
       const res = await fetch(url);
       const data = await res.json();
-
       const prods = Array.isArray(data) ? data : data.data || [];
 
       setProducts(prods);
-
-      // ✅ send to parent (for ResultsBar)
-      if (setParentProducts) {
-        setParentProducts(prods);
-      }
-
-      // reset visible count on filter change
+      if (setParentProducts) setParentProducts(prods);
       setVisibleCount(8);
     } catch (err) {
       console.log("Product fetch failed ❌", err);
     }
   };
 
+  useEffect(() => {
+    fetchProducts();
+
+    // 🔥 Re-fetch when pincode is set/changed
+    window.addEventListener("pincodeUpdated", fetchProducts);
+    return () => window.removeEventListener("pincodeUpdated", fetchProducts);
+  }, [categoryId, subCategoryId]);
+
   const visibleProducts = products.slice(0, visibleCount);
 
   return (
     <div className="px-3 mt-5">
-      {" "}
-      {/* GRID */}
       <div className="grid grid-cols-2 gap-3">
-        {" "}
         {products.length > 0 ? (
           visibleProducts.map((item) => (
             <ProductCard key={item._id} item={item} />
@@ -81,7 +77,7 @@ export default function ProductsGrid({ setProducts: setParentProducts }) {
           </div>
         )}
       </div>
-      {/* SHOW MORE BUTTON */}
+
       {products.length > 8 && visibleCount < products.length && (
         <div className="flex justify-center mt-6">
           <button

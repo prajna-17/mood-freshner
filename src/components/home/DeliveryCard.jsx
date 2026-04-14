@@ -1,6 +1,12 @@
 "use client";
 import { useState, useEffect } from "react";
-import { MapPin } from "lucide-react";
+import {
+  MapPin,
+  LocateFixed,
+  PenLine,
+  CheckCircle2,
+  Loader2,
+} from "lucide-react";
 import { getUserIdFromToken } from "@/utils/auth";
 import LoginModal from "@/components/LoginModal";
 
@@ -51,7 +57,11 @@ function AddressModal({ initial, onSave, onClose }) {
           setErrors((err) => ({ ...err, [key]: undefined }));
         }}
         placeholder={placeholder}
-        className={`rounded-xl border px-3 py-2.5 text-sm outline-none transition ${errors[key] ? "border-red-400 bg-red-50" : "border-sky-200 bg-sky-50 focus:border-sky-400"}`}
+        className={`rounded-xl border px-3 py-2.5 text-sm outline-none transition ${
+          errors[key]
+            ? "border-red-400 bg-red-50"
+            : "border-sky-200 bg-sky-50 focus:border-sky-400"
+        }`}
       />
       {errors[key] && (
         <span className="text-xs text-red-500">{errors[key]}</span>
@@ -89,7 +99,11 @@ function AddressModal({ initial, onSave, onClose }) {
                 setErrors((err) => ({ ...err, city: undefined }));
               }}
               placeholder="Bengaluru"
-              className={`rounded-xl border px-3 py-2.5 text-sm outline-none transition ${errors.city ? "border-red-400 bg-red-50" : "border-sky-200 bg-sky-50 focus:border-sky-400"}`}
+              className={`rounded-xl border px-3 py-2.5 text-sm outline-none transition ${
+                errors.city
+                  ? "border-red-400 bg-red-50"
+                  : "border-sky-200 bg-sky-50 focus:border-sky-400"
+              }`}
             />
             {errors.city && (
               <span className="text-xs text-red-500">{errors.city}</span>
@@ -105,7 +119,11 @@ function AddressModal({ initial, onSave, onClose }) {
                 setErrors((err) => ({ ...err, state: undefined }));
               }}
               placeholder="Karnataka"
-              className={`rounded-xl border px-3 py-2.5 text-sm outline-none transition ${errors.state ? "border-red-400 bg-red-50" : "border-sky-200 bg-sky-50 focus:border-sky-400"}`}
+              className={`rounded-xl border px-3 py-2.5 text-sm outline-none transition ${
+                errors.state
+                  ? "border-red-400 bg-red-50"
+                  : "border-sky-200 bg-sky-50 focus:border-sky-400"
+              }`}
             />
             {errors.state && (
               <span className="text-xs text-red-500">{errors.state}</span>
@@ -129,28 +147,21 @@ export default function DeliveryCard() {
   const [address, setAddress] = useState(null);
   const [showAddressModal, setShowAddressModal] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [detecting, setDetecting] = useState(false);
+  const [detectMsg, setDetectMsg] = useState("");
 
-  // Load address from localStorage
   const loadAddress = () => {
     const userId = getUserIdFromToken();
-
     try {
-      let addr;
-
-      if (userId) {
-        addr = JSON.parse(localStorage.getItem(`address_${userId}`));
-      } else {
-        addr = JSON.parse(localStorage.getItem("address_guest"));
-      }
-
+      const addr = userId
+        ? JSON.parse(localStorage.getItem(`address_${userId}`))
+        : JSON.parse(localStorage.getItem("address_guest"));
       if (addr) setAddress(addr);
     } catch {}
   };
 
   useEffect(() => {
     loadAddress();
-
-    // Listen for address updates from profile page or checkout
     const onUpdate = () => loadAddress();
     window.addEventListener("addressUpdated", onUpdate);
     window.addEventListener("storage", onUpdate);
@@ -160,8 +171,68 @@ export default function DeliveryCard() {
     };
   }, []);
 
-  const handleChangeClick = () => {
-    // Check login
+  // ── Auto-detect ──
+  const handleAutoDetect = () => {
+    if (!navigator.geolocation) {
+      setDetectMsg("Geolocation not supported");
+      return;
+    }
+
+    setDetecting(true);
+    setDetectMsg("");
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        try {
+          const { latitude, longitude } = position.coords;
+          const res = await fetch(
+            `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`,
+          );
+          const data = await res.json();
+          const pincode = data.postcode;
+
+          if (!pincode) {
+            setDetectMsg("Could not find pincode for your location");
+            setDetecting(false);
+            return;
+          }
+
+          const detectedAddress = {
+            fullName: "",
+            phone: "",
+            addressLine: "Your Location",
+            landmark: "",
+            city: data.city || data.locality || "",
+            state: data.principalSubdivision || "",
+            postalCode: pincode,
+          };
+
+          const userId = getUserIdFromToken();
+          const key = userId ? `address_${userId}` : "address_guest";
+          localStorage.setItem(key, JSON.stringify(detectedAddress));
+          localStorage.setItem("pincode", pincode);
+
+          setAddress(detectedAddress);
+          setDetectMsg("✓ Location detected!");
+
+          // 🔥 notify all product components to re-fetch
+          window.dispatchEvent(new Event("addressUpdated"));
+          window.dispatchEvent(new Event("pincodeUpdated"));
+        } catch {
+          setDetectMsg("Failed to detect location");
+        }
+        setDetecting(false);
+      },
+      () => {
+        setDetectMsg("Location access denied");
+        setDetecting(false);
+      },
+      { timeout: 8000, enableHighAccuracy: true },
+    );
+  };
+
+  // ── Manual add ──
+  const handleManualAdd = () => {
     const token = localStorage.getItem("token");
     if (!token) {
       setShowLoginModal(true);
@@ -172,58 +243,114 @@ export default function DeliveryCard() {
 
   const handleSaveAddress = (newAddr) => {
     const userId = getUserIdFromToken();
-
-    if (userId) {
-      localStorage.setItem(`address_${userId}`, JSON.stringify(newAddr));
-    } else {
-      localStorage.setItem("address_guest", JSON.stringify(newAddr));
-    }
-
+    const key = userId ? `address_${userId}` : "address_guest";
+    localStorage.setItem(key, JSON.stringify(newAddr));
     localStorage.setItem("pincode", newAddr.postalCode);
 
     setAddress(newAddr);
     setShowAddressModal(false);
 
+    // 🔥 notify all product components to re-fetch
     window.dispatchEvent(new Event("addressUpdated"));
-    window.location.reload();
+    window.dispatchEvent(new Event("pincodeUpdated"));
   };
+
   return (
     <>
-      <div className="px-4 mt-10">
-        <div className="bg-gradient-to-r from-[#2b6cb0] to-[#1e3a8a] rounded-2xl p-4 flex items-center justify-between shadow-md">
-          {/* LEFT */}
-          <div className="flex items-start gap-2">
-            <MapPin className="text-blue-200 w-5 h-5 mt-1 flex-shrink-0" />
-            <div>
-              <p className="text-blue-200 text-sm">Delivering to</p>
-              {address ? (
-                <>
-                  <p className="text-white font-semibold text-base mt-0.5 leading-tight">
-                    {address.addressLine}
+      <div className="px-4 mt-10 space-y-2">
+        {/* Main Card */}
+        <div className="bg-gradient-to-r from-[#2b6cb0] to-[#1e3a8a] rounded-2xl p-4 shadow-md">
+          <div className="flex items-center justify-between">
+            {/* LEFT — address info */}
+            <div className="flex items-start gap-2">
+              <MapPin className="text-blue-200 w-5 h-5 mt-1 flex-shrink-0" />
+              <div>
+                <p className="text-blue-200 text-sm">Delivering to</p>
+                {address ? (
+                  <>
+                    <p className="text-white font-semibold text-base mt-0.5 leading-tight">
+                      {address.addressLine}
+                    </p>
+                    <p className="text-blue-200 text-xs mt-0.5">
+                      {address.city}, {address.state} — {address.postalCode}
+                    </p>
+                  </>
+                ) : (
+                  <p className="text-white font-medium text-base mt-1">
+                    Set your delivery location
                   </p>
-                  <p className="text-blue-200 text-xs mt-0.5">
-                    {address.city}, {address.state} — {address.postalCode}
-                  </p>
-                </>
-              ) : (
-                <p className="text-white font-medium text-base mt-1">
-                  Add a delivery address
-                </p>
-              )}
+                )}
+              </div>
             </div>
+
+            {/* RIGHT — change button if address exists */}
+            {address && (
+              <button
+                onClick={handleManualAdd}
+                className="text-orange-400 font-medium underline text-sm whitespace-nowrap ml-3"
+              >
+                Change
+              </button>
+            )}
           </div>
 
-          {/* RIGHT */}
-          <button
-            onClick={handleChangeClick}
-            className="text-orange-400 font-medium underline text-sm whitespace-nowrap ml-3 transition-opacity hover:opacity-70"
-          >
-            {address ? "Change" : "Add"}
-          </button>
+          {/* Action Buttons — shown when no address OR always */}
+          {!address && (
+            <div className="flex gap-2 mt-4">
+              {/* Auto Detect */}
+              <button
+                onClick={handleAutoDetect}
+                disabled={detecting}
+                className="flex-1 flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 border border-white/30 text-white text-sm font-medium py-2.5 rounded-xl transition active:scale-95"
+              >
+                {detecting ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <LocateFixed className="w-4 h-4" />
+                )}
+                {detecting ? "Detecting..." : "Auto Detect"}
+              </button>
+
+              {/* Add Manually */}
+              <button
+                onClick={handleManualAdd}
+                className="flex-1 flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 text-white text-sm font-medium py-2.5 rounded-xl transition active:scale-95"
+              >
+                <PenLine className="w-4 h-4" />
+                Add Manually
+              </button>
+            </div>
+          )}
+
+          {/* If address exists, show small re-detect option */}
+          {address && (
+            <div className="flex gap-2 mt-3">
+              <button
+                onClick={handleAutoDetect}
+                disabled={detecting}
+                className="flex items-center gap-1.5 bg-white/10 hover:bg-white/20 border border-white/20 text-white/80 text-xs py-1.5 px-3 rounded-lg transition"
+              >
+                {detecting ? (
+                  <Loader2 className="w-3 h-3 animate-spin" />
+                ) : (
+                  <LocateFixed className="w-3 h-3" />
+                )}
+                {detecting ? "Detecting..." : "Re-detect location"}
+              </button>
+            </div>
+          )}
         </div>
+
+        {/* Status message */}
+        {detectMsg && (
+          <p
+            className={`text-xs px-1 ${detectMsg.startsWith("✓") ? "text-green-600" : "text-red-500"}`}
+          >
+            {detectMsg}
+          </p>
+        )}
       </div>
 
-      {/* Address Modal */}
       {showAddressModal && (
         <AddressModal
           initial={address}
@@ -232,7 +359,6 @@ export default function DeliveryCard() {
         />
       )}
 
-      {/* Login Modal (shown if not logged in) */}
       <LoginModal
         isOpen={showLoginModal}
         onClose={() => setShowLoginModal(false)}

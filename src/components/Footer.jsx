@@ -21,11 +21,17 @@ const footerLinks = {
 
 export default function Footer() {
   return (
-    <footer className="bg-[#1a3c5e] text-white relative overflow-hidden">
+    <footer
+      className="text-white relative overflow-hidden"
+      style={{
+        background:
+          "linear-gradient(135deg, #0c1a4c 0%, #1a3a8a 50%, #0e2260 100%)",
+      }}
+    >
+      {" "}
       {/* Decorative background blobs */}
       <div className="absolute top-0 left-0 w-64 h-64 bg-white/5 rounded-full -translate-x-1/2 -translate-y-1/2 blur-3xl pointer-events-none" />
       <div className="absolute bottom-0 right-0 w-96 h-96 bg-[#f5c842]/5 rounded-full translate-x-1/3 translate-y-1/3 blur-3xl pointer-events-none" />
-
       {/* Wave divider */}
       {/* <div className="w-full overflow-hidden leading-none -mt-1">
         <svg
@@ -36,14 +42,13 @@ export default function Footer() {
           <path d="M0,40 C360,80 1080,0 1440,40 L1440,0 L0,0 Z" />
         </svg>
       </div> */}
-
       <div className="max-w-7xl mx-auto px-4 pt-6 pb-12 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
           {/* Brand column */}
           <div>
             <div className="space-y-3">
               <Image
-                src="/img/logo1.png"
+                src="/img/logo8.png"
                 alt="MoodFresh"
                 width={140}
                 height={50}

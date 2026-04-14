@@ -82,6 +82,7 @@ export default function CategoriesSection() {
                   width={32}
                   height={32}
                   style={{ objectFit: "contain" }}
+                  unoptimized
                 />
               </div>
 
