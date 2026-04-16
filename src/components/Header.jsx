@@ -1,7 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { ShoppingCart, Bell, User, Wifi } from "lucide-react";
+import { ShoppingCart, Bell, User, Wifi, Download } from "lucide-react";
+import { usePWAInstall } from "@/hooks/usePWAInstall";
 import { useState, useEffect } from "react";
 
 export default function Header() {
@@ -9,7 +10,7 @@ export default function Header() {
   const [cartBump, setCartBump] = useState(false);
   const [bellShake, setBellShake] = useState(false);
   const [time, setTime] = useState("");
-
+  const { install, isInstallable } = usePWAInstall();
   // Shrink on scroll
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
@@ -137,8 +138,18 @@ export default function Header() {
               priority
             />
           </div>
-
           {/* ── Right: Icons ── */}
+          <div className="absolute right-4 flex items-center gap-3">
+            {isInstallable && (
+              <button
+                onClick={install}
+                className="hdr-icon-btn text-white"
+                title="Install App"
+              >
+                <Download size={20} />
+              </button>
+            )}
+          </div>{" "}
         </div>
         {/* Bottom border glow */}
         <div

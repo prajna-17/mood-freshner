@@ -59,14 +59,14 @@ export default function BottomNav() {
                 href={href}
                 onClick={(e) => {
                   if (href === "/profile" && !isLoggedIn()) {
-                    e.preventDefault(); // ❌ stop navigation
-                    setOpenLogin(true); // ✅ open modal
+                    e.preventDefault(); 
+                    setOpenLogin(true); 
                   }
                 }}
                 className="flex-1 flex justify-center items-center relative"
                 style={{ height: "100%" }}
               >
-                {/* 🔥 CART BADGE */}
+                
                 {href === "/cart" && count > 0 && (
                   <span className="absolute top-1 right-[30%] bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full z-[5]">
                     {count}
@@ -74,7 +74,7 @@ export default function BottomNav() {
                 )}
                 {active && (
                   <>
-                    {/* SVG smooth concave notch */}
+                    
                     <div
                       className="absolute"
                       style={{
@@ -89,7 +89,7 @@ export default function BottomNav() {
                         zIndex: 1,
                       }}
                     />
-                    {/* Circle */}
+                    
                     <div
                       className="absolute flex items-center justify-center"
                       style={{

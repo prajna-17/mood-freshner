@@ -1,0 +1,21 @@
+{
+  "name": "MoodFresh",
+  "short_name": "Mood",
+  "id": "/",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0c1a4c",
+  "icons": [
+    {
+      "src": "/img/logo31.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/img/logo71.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
