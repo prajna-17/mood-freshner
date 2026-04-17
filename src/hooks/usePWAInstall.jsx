@@ -15,17 +15,23 @@ export function usePWAInstall() {
     setIsInstalled(standalone);
 
     const handler = (e) => {
-      console.log("PWA install available ✅"); // ADD THIS
-
       e.preventDefault(); // stop automatic popup
       setDeferredPrompt(e);
       setIsInstallable(true);
     };
 
+    const installedHandler = () => {
+      setIsInstalled(true);
+      setIsInstallable(false);
+      setDeferredPrompt(null);
+    };
+
     window.addEventListener("beforeinstallprompt", handler);
+    window.addEventListener("appinstalled", installedHandler);
 
     return () => {
       window.removeEventListener("beforeinstallprompt", handler);
+      window.removeEventListener("appinstalled", installedHandler);
     };
   }, []);
 
@@ -50,5 +56,6 @@ export function usePWAInstall() {
   return {
     install,
     isInstallable: isInstallable && !isInstalled,
+    isInstalled,
   };
 }

@@ -19,6 +19,11 @@ import {
   Banknote,
   RefreshCcw,
 } from "lucide-react";
+import {
+  getPaymentMethodLabel,
+  getPaymentStatusLabel,
+  isPaymentSuccessful,
+} from "@/utils/payment";
 
 const API_BASE = "https://mood-freshner-backend.onrender.com/api";
 // ── Tracker steps ─────────────────────────────────────────────────────────────
@@ -627,7 +632,8 @@ export default function OrderDetailPage() {
                   className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
                   style={{ background: "#f0fdf4" }}
                 >
-                  {order.paymentMethod === "COD" ? (
+                  {order.paymentMethod === "COD" ||
+                  order.paymentMethod === "COINS_AND_COD" ? (
                     <Banknote size={18} color="#10b981" strokeWidth={2.2} />
                   ) : (
                     <CreditCard size={18} color="#10b981" strokeWidth={2.2} />
@@ -635,27 +641,33 @@ export default function OrderDetailPage() {
                 </div>
                 <div className="flex-1">
                   <p className="text-sm font-black text-gray-700">
-                    {order.paymentMethod === "COD"
-                      ? "Cash on Delivery"
-                      : "Online Payment"}
+                    {getPaymentMethodLabel(order.paymentMethod)}
                   </p>
                   <p className="text-xs text-gray-400 font-semibold mt-0.5">
-                    {order.paymentMethod === "COD"
-                      ? "Pay when you receive"
-                      : "UPI · Card · Netbanking"}
+                    {order.paymentMethod === "COINS"
+                      ? "Paid fully with coins"
+                      : order.paymentMethod === "COINS_AND_COD"
+                        ? "Coins paid now · COD on delivery"
+                        : order.paymentMethod === "COINS_AND_ONLINE"
+                          ? "Coins applied · Remaining via online payment"
+                          : order.paymentMethod === "COD"
+                            ? "Pay when you receive"
+                            : "UPI · Card · Netbanking"}
                   </p>
                 </div>
                 <div
                   className="px-2.5 py-1 rounded-full text-xs font-black"
                   style={{
-                    background:
-                      order.paymentStatus === "PAID" ? "#f0fdf4" : "#fff7ed",
-                    color:
-                      order.paymentStatus === "PAID" ? "#16a34a" : "#f97316",
-                    border: `1px solid ${order.paymentStatus === "PAID" ? "#86efac" : "#fed7aa"}`,
+                    background: isPaymentSuccessful(order.paymentStatus)
+                      ? "#f0fdf4"
+                      : "#fff7ed",
+                    color: isPaymentSuccessful(order.paymentStatus)
+                      ? "#16a34a"
+                      : "#f97316",
+                    border: `1px solid ${isPaymentSuccessful(order.paymentStatus) ? "#86efac" : "#fed7aa"}`,
                   }}
                 >
-                  {order.paymentStatus || "PENDING"}
+                  {getPaymentStatusLabel(order.paymentStatus)}
                 </div>
               </div>
 

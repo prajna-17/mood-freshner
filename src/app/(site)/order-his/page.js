@@ -14,6 +14,7 @@ import {
   Home,
 } from "lucide-react";
 import { getUserIdFromToken } from "@/utils/auth";
+import { getPaymentMethodLabel, getPaymentStatusLabel } from "@/utils/payment";
 
 const API_BASE = "https://mood-freshner-backend.onrender.com/api";
 // ── Status config ─────────────────────────────────────────────────────────────
@@ -324,8 +325,8 @@ export default function OrderHistoryPage() {
                         {formatDate(order.createdAt)}
                       </p>
                       <p className="text-xs font-bold text-gray-500 mt-0.5">
-                        {order.paymentMethod || "COD"} ·{" "}
-                        {order.paymentStatus || "PENDING"}
+                        {getPaymentMethodLabel(order.paymentMethod)} ·{" "}
+                        {getPaymentStatusLabel(order.paymentStatus)}
                       </p>
                     </div>
                     <div className="flex items-center gap-2">

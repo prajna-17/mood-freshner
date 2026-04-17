@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { API } from "@/utils/api";
+import { getPaymentMethodLabel, getPaymentStatusLabel } from "@/utils/payment";
 import "@/components/admin/modal.css";
 
 export default function AdminOrders() {
@@ -89,8 +90,12 @@ export default function AdminOrders() {
   const filteredOrders = orders.filter((order) => {
     if (filter === "PENDING") return order.orderStatus !== "DELIVERED";
     if (filter === "DELIVERED") return order.orderStatus === "DELIVERED";
-    if (filter === "COD") return order.paymentMethod === "COD";
-    if (filter === "ONLINE") return order.paymentMethod === "ONLINE";
+    if (filter === "COD")
+      return String(order.paymentMethod || "").includes("COD");
+    if (filter === "ONLINE")
+      return String(order.paymentMethod || "").includes("ONLINE");
+    if (filter === "COINS")
+      return String(order.paymentMethod || "").includes("COINS");
     return true; // ALL
   });
 
@@ -238,12 +243,14 @@ export default function AdminOrders() {
 
               <div className="product-sub">
                 <span>Total: ₹{order.totalAmount}</span>
-                <span>{order.paymentMethod}</span>
+                <span>{getPaymentMethodLabel(order.paymentMethod)}</span>
               </div>
 
               <div className="product-sub">
                 <span>Status: {getStatusBadge(order.orderStatus)}</span>
-                <span>Payment: {order.paymentStatus}</span>
+                <span>
+                  Payment: {getPaymentStatusLabel(order.paymentStatus)}
+                </span>
               </div>
 
               <div style={{ marginTop: 8 }}>

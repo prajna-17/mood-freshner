@@ -3,6 +3,11 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { API } from "@/utils/api";
+import {
+  getPaymentMethodLabel,
+  getPaymentStatusLabel,
+  isPaymentSuccessful,
+} from "@/utils/payment";
 import "@/components/admin/modal.css";
 
 export default function AdminOrderDetails() {
@@ -111,12 +116,12 @@ export default function AdminOrderDetails() {
           {/* PAYMENT */}
           <div className="product-sub">
             <span>Total: ₹{order.totalAmount}</span>
-            <span>{order.paymentMethod}</span>
+            <span>{getPaymentMethodLabel(order.paymentMethod)}</span>
           </div>
 
           <div className="product-sub">
             <span>Status: {order.orderStatus}</span>
-            <span>Payment: {order.paymentStatus}</span>
+            <span>Payment: {getPaymentStatusLabel(order.paymentStatus)}</span>
           </div>
 
           <hr style={{ margin: "14px 0" }} />

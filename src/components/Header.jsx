@@ -10,7 +10,7 @@ export default function Header() {
   const [cartBump, setCartBump] = useState(false);
   const [bellShake, setBellShake] = useState(false);
   const [time, setTime] = useState("");
-  const { install, isInstallable } = usePWAInstall();
+  const { install, isInstallable, isInstalled } = usePWAInstall();
   // Shrink on scroll
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
@@ -140,7 +140,7 @@ export default function Header() {
           </div>
           {/* ── Right: Icons ── */}
           <div className="absolute right-4 flex items-center gap-3">
-            {isInstallable && (
+            {!isInstalled && (
               <button
                 onClick={install}
                 className="hdr-icon-btn text-white"

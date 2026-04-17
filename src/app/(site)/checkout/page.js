@@ -224,6 +224,18 @@ function CheckoutContent() {
 
   const isFullyPaidByCoins = total === 0;
 
+  const resolvedPaymentMethod = isFullyPaidByCoins
+    ? "COINS"
+    : useCoins
+      ? payment === "cod"
+        ? "COINS_AND_COD"
+        : "COINS_AND_ONLINE"
+      : payment === "cod"
+        ? "COD"
+        : "ONLINE";
+
+  const resolvedPaymentStatus = isFullyPaidByCoins ? "SUCCESS" : "PENDING";
+
   // ── Place Order — UPDATED to deduct coins if used ──────────────────────────
   const handlePlaceOrder = async () => {
     if (!address) {
@@ -289,7 +301,13 @@ function CheckoutContent() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ products, shippingAddress: address }),
+        body: JSON.stringify({
+          products,
+          shippingAddress: address,
+          paymentMethod: resolvedPaymentMethod,
+          paymentStatus: resolvedPaymentStatus,
+          coinsUsed: coinsToApply,
+        }),
       });
 
       const data = await res.json();
