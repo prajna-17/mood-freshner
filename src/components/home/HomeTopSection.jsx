@@ -104,7 +104,7 @@ export default function HomeTopSection() {
             className="text-orange-500 text-sm font-medium"
             style={{ fontFamily: "Georgia, serif" }}
           >
-            Good morning, {user?.name || "Guest"}
+            Welcome, {user?.name || "Guest"}
           </p>
           <h1
             className="text-2xl font-medium text-gray-900 leading-tight mt-1"

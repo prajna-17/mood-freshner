@@ -1,7 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { ShoppingCart, Bell, User, Wifi, Download } from "lucide-react";
+import Link from "next/link";
+import { ShoppingCart, Bell, User, Wifi, Download, Menu, X } from "lucide-react";
 import { usePWAInstall } from "@/hooks/usePWAInstall";
 import { useState, useEffect } from "react";
 
@@ -10,6 +11,7 @@ export default function Header() {
   const [cartBump, setCartBump] = useState(false);
   const [bellShake, setBellShake] = useState(false);
   const [time, setTime] = useState("");
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { install, isInstallable, isInstalled } = usePWAInstall();
   // Shrink on scroll
   useEffect(() => {
@@ -126,7 +128,18 @@ export default function Header() {
             transition: "height 0.3s cubic-bezier(.22,1,.36,1)",
           }}
         >
-          {/* ── Left: Logo ── */}
+          {/* ── Left: Menu Icon ── */}
+          <div className="absolute left-4 flex items-center">
+            <button
+              onClick={() => setIsMenuOpen(true)}
+              className="hdr-icon-btn text-white p-1 -ml-1"
+              title="Open Menu"
+            >
+              <Menu size={26} />
+            </button>
+          </div>
+
+          {/* ── Center: Logo ── */}
           <div className="hdr-logo">
             <Image
               src="/img/logo7.png"
@@ -143,10 +156,14 @@ export default function Header() {
             {!isInstalled && (
               <button
                 onClick={install}
-                className="hdr-icon-btn text-white"
+                className="hdr-icon-btn text-white flex items-center gap-2"
                 title="Install App"
               >
-                <Download size={20} />
+               <div className="flex flex-col text-center leading-tight">
+                 <span className="text-[10px] sm:text-sm font-medium">Download</span>
+                 <span className="text-[10px] sm:text-sm font-medium">our app</span>
+               </div>
+               <Download size={20} className="w-5 h-5 sm:w-5 sm:h-5" />
               </button>
             )}
           </div>{" "}
@@ -160,6 +177,46 @@ export default function Header() {
           }}
         />
       </header>
+
+      {/* ── Mobile Menu Drawer ── */}
+      <div
+        className={`fixed inset-0 z-[60] bg-black/50 backdrop-blur-sm transition-opacity duration-300 ${isMenuOpen ? "opacity-100 visible" : "opacity-0 invisible"}`}
+        onClick={() => setIsMenuOpen(false)}
+      />
+      <div
+        className={`fixed top-0 left-0 bottom-0 w-72 bg-white z-[70] shadow-2xl transform transition-transform duration-300 ease-in-out ${isMenuOpen ? "translate-x-0" : "-translate-x-full"}`}
+      >
+        <div className="p-5 flex items-center justify-between border-b border-gray-100">
+          <span className="text-xl font-bold text-[#0c1a4c]">Menu</span>
+          <button
+            onClick={() => setIsMenuOpen(false)}
+            className="p-2 bg-gray-100 rounded-full text-gray-600 hover:text-gray-900 hover:bg-gray-200 transition-colors"
+          >
+            <X size={20} />
+          </button>
+        </div>
+        <div className="py-4 px-2 overflow-y-auto h-[calc(100%-73px)]">
+          {[
+            { name: "About Us", href: "/about" },
+            { name: "Our Farm", href: "/farm" },
+            { name: "Products", href: "/products" },
+            { name: "Blogs", href: "/blogs" },
+            { name: "Contact Us", href: "/contact" },
+            { name: "Feedback", href: "/feedback" },
+            { name: "Customer Reviews", href: "/reviews" },
+            { name: "Business Opportunity", href: "/business" },
+          ].map((item, index) => (
+            <Link
+              key={index}
+              href={item.href}
+              onClick={() => setIsMenuOpen(false)}
+              className="block px-4 py-3 text-gray-700 hover:bg-orange-50 hover:text-orange-600 rounded-lg transition-colors font-medium text-sm mb-1"
+            >
+              {item.name}
+            </Link>
+          ))}
+        </div>
+      </div>
     </>
   );
 }
