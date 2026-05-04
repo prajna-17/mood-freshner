@@ -5,17 +5,24 @@ import { useState } from "react";
 
 const footerLinks = {
   SHOP: [
-    { label: "Milk & Cream", href: "/category/milk" },
-    { label: "Butter & Ghee", href: "/category/butter" },
-    { label: "Cheese", href: "/category/cheese" },
-    { label: "Yogurt & Curd", href: "/category/yogurt" },
-    { label: "Eggs", href: "/category/eggs" },
+    { label: "All Products", href: "/products" },
+    { label: "Fresh Milk", href: "/products?category=milk" },
+    { label: "Pure Ghee", href: "/products?category=ghee" },
+    { label: "Curd & Paneer", href: "/products?category=dairy" },
+    { label: "Our Farm", href: "/farm" },
   ],
   COMPANY: [
     { label: "About Us", href: "/about" },
-    { label: "Our Farms", href: "/farms" },
-    { label: "Blogs", href: "/blog" },
+    { label: "Latest Blogs", href: "/blogs" },
+    { label: "Feedback", href: "/feedback" },
+    { label: "Customer Reviews", href: "/reviews" },
     { label: "Contact Us", href: "/contact" },
+  ],
+  ACCOUNT: [
+    { label: "My Profile", href: "/profile" },
+    { label: "Order History", href: "/order-his" },
+    { label: "Notifications", href: "/notifications" },
+    { label: "Shopping Cart", href: "/cart" },
   ],
 };
 
@@ -32,55 +39,42 @@ export default function Footer() {
       {/* Decorative background blobs */}
       <div className="absolute top-0 left-0 w-64 h-64 bg-white/5 rounded-full -translate-x-1/2 -translate-y-1/2 blur-3xl pointer-events-none" />
       <div className="absolute bottom-0 right-0 w-96 h-96 bg-[#f5c842]/5 rounded-full translate-x-1/3 translate-y-1/3 blur-3xl pointer-events-none" />
-      {/* Wave divider */}
-      {/* <div className="w-full overflow-hidden leading-none -mt-1">
-        <svg
-          viewBox="0 0 1440 60"
-          preserveAspectRatio="none"
-          className="w-full h-14 fill-gray-50"
-        >
-          <path d="M0,40 C360,80 1080,0 1440,40 L1440,0 L0,0 Z" />
-        </svg>
-      </div> */}
-      <div className="max-w-7xl mx-auto px-4 pt-6 pb-12 relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+      
+      <div className="max-w-7xl mx-auto px-4 pt-12 pb-12 relative z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-12">
           {/* Brand column */}
-          <div>
-            <div className="space-y-3">
+          <div className="lg:col-span-1">
+            <div className="space-y-4">
               <Image
                 src="/img/logo8.png"
                 alt="MoodFresh"
                 width={140}
                 height={50}
+                className="brightness-0 invert opacity-90"
               />
-              <p className="text-white/70 text-sm">
-                Farm fresh dairy, delivered with love.
+              <p className="text-white/60 text-sm leading-relaxed">
+                Farm fresh dairy, delivered with love. Pure, natural, and straight
+                from happy farms to your doorstep.
               </p>
             </div>
-            <p className="text-white/60 text-sm leading-relaxed mb-5">
-              Farm fresh dairy, delivered with love. Pure, natural, and straight
-              from happy farms to your doorstep.
-            </p>
           </div>
 
-          {/* SHOP + COMPANY side by side */}
-          <div className="grid grid-cols-2 gap-10">
+          {/* Links columns */}
+          <div className="lg:col-span-3 grid grid-cols-2 md:grid-cols-3 gap-10">
             {Object.entries(footerLinks).map(([title, links]) => (
               <div key={title}>
-                <h4 className="text-[#f5c842] font-black text-sm tracking-widest uppercase mb-4">
+                <h4 className="text-[#f5c842] font-black text-xs tracking-[0.2em] uppercase mb-6">
                   {title}
                 </h4>
-                <ul className="space-y-2.5">
+                <ul className="space-y-3.5">
                   {links.map((link, i) => (
                     <li key={i}>
                       <Link
                         href={link.href}
                         prefetch={false}
-                        className="text-white/60 hover:text-white text-sm transition-all duration-200 hover:translate-x-1 inline-block group"
+                        className="text-white/50 hover:text-white text-[13px] font-medium transition-all duration-200 hover:translate-x-1 inline-flex items-center gap-2 group"
                       >
-                        <span className="group-hover:text-[#f5c842] transition-colors">
-                          ›
-                        </span>{" "}
+                        <span className="w-1.5 h-[1.5px] bg-[#f5c842] scale-x-0 group-hover:scale-x-100 transition-transform origin-left" />
                         {link.label}
                       </Link>
                     </li>

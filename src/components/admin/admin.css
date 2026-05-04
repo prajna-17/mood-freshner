@@ -5,20 +5,30 @@
 
 :root {
   /* BRAND – DARK BLUE */
-  --brand: #0f243e; /* deep navy */
-  --brand-dark: #0b1b2f; /* darker navy */
-  --brand-light: #1c3b63; /* accent blue */
+  --brand: #0f243e;
+  /* deep navy */
+  --brand-dark: #0b1b2f;
+  /* darker navy */
+  --brand-light: #1c3b63;
+  /* accent blue */
 
   /* BACKGROUNDS */
-  --bg: #0f243e; /* main background */
-  --bg-soft: #142b4d; /* cards / sections */
-  --bg-sidebar: #0b1b2f; /* sidebar */
-  --bg-header: #0b1b2f; /* header */
+  --bg: #0f243e;
+  /* main background */
+  --bg-soft: #142b4d;
+  /* cards / sections */
+  --bg-sidebar: #0b1b2f;
+  /* sidebar */
+  --bg-header: #0b1b2f;
+  /* header */
 
   /* TEXT (HIGH CONTRAST) */
-  --text: #ffffff; /* primary text */
-  --text-soft: #cfd8e3; /* secondary text */
-  --text-muted: #9aa8bb; /* labels */
+  --text: #ffffff;
+  /* primary text */
+  --text-soft: #cfd8e3;
+  /* secondary text */
+  --text-muted: #9aa8bb;
+  /* labels */
 
   /* BORDERS & EFFECTS */
   --border: rgba(255, 255, 255, 0.08);
@@ -753,6 +763,7 @@
    RESPONSIVE (MOBILE VIEW)
 --------------------------------*/
 @media (max-width: 768px) {
+
   /* Sidebar */
   .admin-sidebar {
     position: fixed;
@@ -777,7 +788,8 @@
     margin-left: 240px;
     padding: 85px 26px 26px;
     width: 100%;
-    background: #ffffff; /* KEEP PAGE WHITE */
+    background: #ffffff;
+    /* KEEP PAGE WHITE */
   }
 
   /* Product grid */
@@ -827,6 +839,7 @@
   font-size: 14px;
   font-weight: 500;
 }
+
 html,
 body {
   background: #ffffff !important;
