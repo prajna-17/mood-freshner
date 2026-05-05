@@ -12,22 +12,24 @@ import FlashSale from "@/components/home/FlashSale";
 import OurStory from "@/components/home/OurStory";
 import RecentlyPurchased from "@/components/home/RecentlyPurchased";
 import WhyChoose from "@/components/home/WhyChoose";
+import HomeReviewsSlider from "@/components/home/CustomerReviews";
 
 export default function Home() {
-  // 🔥 Always render immediately — products handle their own fetching
-  return (
-    <>
-      <HomeTopSection />
-      <DeliveryCard />
-      <BannerSection />
-      <CategoriesSection />
-      <BestSellers />
-      <PromoBanner />
-      <TodaysFresh />
-      <FlashSale />
-      <OurStory />
-      <RecentlyPurchased />
-      <WhyChoose />
-    </>
-  );
+	// 🔥 Always render immediately — products handle their own fetching
+	return (
+		<>
+			<HomeTopSection />
+			<DeliveryCard />
+			<BannerSection />
+			<CategoriesSection />
+			<BestSellers />
+			<PromoBanner />
+			<TodaysFresh />
+			<FlashSale />
+			<OurStory />
+			<RecentlyPurchased />
+			<WhyChoose />
+			<HomeReviewsSlider />
+		</>
+	);
 }
