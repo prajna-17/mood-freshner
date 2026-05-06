@@ -5,7 +5,7 @@ import Link from "next/link";
 
 export default function BannerSection() {
   return (
-    <div className="w-full p-1 flex flex-col gap-4 mt-10">
+    <div className="w-full p-1 flex flex-col gap-4 mt-3">
       {/* TOP BANNER */}
       <Link href="/products">
         <div className="w-full overflow-hidden cursor-pointer">

@@ -221,6 +221,7 @@ export default function DeliveryCard() {
 						`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`,
 					);
 					const data = await res.json();
+					console.log(data);
 					const pincode = data.postcode;
 
 					if (!pincode) {
@@ -296,107 +297,61 @@ export default function DeliveryCard() {
 
 	return (
 		<>
-			<div className="px-4 mt-10 space-y-2">
-				{/* Main Card */}
-				<div className="bg-gradient-to-r from-[#2b6cb0] to-[#1e3a8a] rounded-2xl p-4 shadow-md">
-					<div className="flex items-center justify-between">
-						{/* LEFT — address info */}
-						<div className="flex items-start gap-2">
-							<MapPin className="text-blue-200 w-5 h-5 mt-1 flex-shrink-0" />
-							<div>
-								<p className="text-blue-200 text-sm">
-									Delivering to
-								</p>
-								{address ? (
-									<>
-										<p className="text-white font-semibold text-base mt-0.5 leading-tight">
-											{address.addressLine}
-										</p>
-										<p className="text-blue-200 text-xs mt-0.5">
-											{address.city},{" "}
-											{address.state} —{" "}
-											{address.postalCode}
-										</p>
-									</>
-								) : (
-									<p className="text-white font-medium text-base mt-1">
-										Set your delivery location
-									</p>
-								)}
-							</div>
-						</div>
+			<div className="px-4 mt-2">
+  <div className="bg-gradient-to-r from-[#2b6cb0] to-[#1e3a8a] rounded-xl px-3 py-2 flex items-center justify-between gap-2 shadow-sm">
 
-						{/* RIGHT — change button if address exists */}
-						{address && (
-							<button
-								onClick={handleManualAdd}
-								className="text-orange-400 font-medium underline text-sm whitespace-nowrap ml-3"
-							>
-								Change
-							</button>
-						)}
-					</div>
+    {/* LEFT — Address */}
+    <div className="flex items-center gap-2 min-w-0 flex-1">
+      <MapPin className="text-blue-200 w-4 h-4 flex-shrink-0" />
 
-					{/* Action Buttons — shown when no address OR always */}
-					{!address && (
-						<div className="flex gap-2 mt-4">
-							{/* Auto Detect */}
-							<button
-								onClick={handleAutoDetect}
-								disabled={detecting}
-								className="flex-1 flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 border border-white/30 text-white text-sm font-medium py-2.5 rounded-xl transition active:scale-95"
-							>
-								{detecting ? (
-									<Loader2 className="w-4 h-4 animate-spin" />
-								) : (
-									<LocateFixed className="w-4 h-4" />
-								)}
-								{detecting
-									? "Detecting..."
-									: "Auto Detect"}
-							</button>
+      {address ? (
+        <p className="text-white text-sm truncate">
+          {address.addressLine}, {address.city}
+        </p>
+      ) : (
+        <p className="text-white text-sm truncate">
+          Set delivery location
+        </p>
+      )}
+    </div>
 
-							{/* Add Manually */}
-							<button
-								onClick={handleManualAdd}
-								className="flex-1 flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 text-white text-sm font-medium py-2.5 rounded-xl transition active:scale-95"
-							>
-								<PenLine className="w-4 h-4" />
-								Add Manually
-							</button>
-						</div>
-					)}
+    {/* RIGHT — Actions */}
+    <div className="flex items-center gap-1 flex-shrink-0">
 
-					{/* If address exists, show small re-detect option */}
-					{address && (
-						<div className="flex gap-2 mt-3">
-							<button
-								onClick={handleAutoDetect}
-								disabled={detecting}
-								className="flex items-center gap-1.5 bg-white/10 hover:bg-white/20 border border-white/20 text-white/80 text-xs py-1.5 px-3 rounded-lg transition"
-							>
-								{detecting ? (
-									<Loader2 className="w-3 h-3 animate-spin" />
-								) : (
-									<LocateFixed className="w-3 h-3" />
-								)}
-								{detecting
-									? "Detecting..."
-									: "Re-detect location"}
-							</button>
-						</div>
-					)}
-				</div>
+      {/* Detect */}
+      <button
+        onClick={handleAutoDetect}
+        disabled={detecting}
+        className="p-1.5 rounded-md bg-white/10 border border-white/20 text-white/90"
+      >
+        {detecting ? (
+          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+        ) : (
+          <LocateFixed className="w-3.5 h-3.5" />
+        )}
+      </button>
 
-				{/* Status message */}
-				{detectMsg && (
-					<p
-						className={`text-xs px-1 ${detectMsg.startsWith("✓") ? "text-green-600" : "text-red-500"}`}
-					>
-						{detectMsg}
-					</p>
-				)}
-			</div>
+      {/* Manual Add / Change */}
+      <button
+        onClick={handleManualAdd}
+        className="p-1.5 rounded-md bg-orange-500 text-white"
+      >
+        <PenLine className="w-3.5 h-3.5" />
+      </button>
+    </div>
+  </div>
+
+  {/* Status (optional, stays below) */}
+  {detectMsg && (
+    <p
+      className={`text-[10px] mt-1 px-1 ${
+        detectMsg.startsWith("✓") ? "text-green-600" : "text-red-500"
+      }`}
+    >
+      {detectMsg}
+    </p>
+  )}
+</div>
 
 			{showAddressModal && (
 				<AddressModal

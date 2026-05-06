@@ -20,11 +20,11 @@ export default function Home() {
 		<>
 			<HomeTopSection />
 			<DeliveryCard />
-			<BannerSection />
-			<CategoriesSection />
-			<BestSellers />
-			<PromoBanner />
 			<TodaysFresh />
+			<BestSellers />
+			<CategoriesSection />
+			<BannerSection />
+			<PromoBanner />
 			<FlashSale />
 			<OurStory />
 			<RecentlyPurchased />
