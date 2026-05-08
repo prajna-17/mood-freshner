@@ -10,6 +10,12 @@ export default function CouponCard() {
   useEffect(() => {
     const cart = getCart();
     setHasItems(cart.length > 0);
+
+    // Check if coupon is already applied
+    const coupon = localStorage.getItem("coupon");
+    if (coupon) {
+      setApplied(true);
+    }
   }, []);
   return (
     <div className="px-4 mt-10">

@@ -2,8 +2,9 @@
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { getCart, clearCart } from "@/utils/cart";
-import { getUserIdFromToken } from "@/utils/auth";
+import { getToken, getUserIdFromToken } from "@/utils/auth";
 import { Suspense } from "react";
+import { saveAddress } from "@/utils/user";
 
 const DELIVERY_FEE = 99;
 const API_BASE = "https://mood-freshner-backend.onrender.com/api";
@@ -61,16 +62,28 @@ function AddressModal({ initial, onSave, onClose }) {
 		return e;
 	};
 
-	const handleSave = () => {
+	const handleSave = async () => {
 		const e = validate();
+
 		if (Object.keys(e).length) {
 			setErrors(e);
 			return;
 		}
-		saveAddressToStorage(form);
-		localStorage.setItem("pincode", form.postalCode);
-		window.dispatchEvent(new Event("addressUpdated"));
-		onSave(form);
+
+		try {
+			const token = getToken();
+			await saveAddress(form, token);
+
+			saveAddressToStorage(form);
+
+			localStorage.setItem("pincode", form.postalCode);
+
+			window.dispatchEvent(new Event("addressUpdated"));
+
+			onSave(form);
+		} catch (error) {
+			console.error(error);
+		}
 	};
 
 	const field = (label, key, placeholder, type = "text") => (

@@ -118,6 +118,7 @@ export default function LoginModal({ isOpen, onClose }) {
 										);
 
 										const data = await res.json();
+										console.log(data);
 
 										if (!res.ok)
 											throw new Error(
@@ -131,6 +132,12 @@ export default function LoginModal({ isOpen, onClose }) {
 										localStorage.setItem(
 											"user",
 											JSON.stringify(data),
+										);
+										localStorage.setItem(
+											`address_${data._id}`,
+											JSON.stringify(
+												data.address,
+											),
 										);
 
 										setSuccess(true);

@@ -4,11 +4,34 @@ import { useEffect, useState } from "react";
 import { Zap } from "lucide-react";
 
 export default function FlashSale() {
-  const [time, setTime] = useState(4 * 60 * 60); // 4 hrs
+  const [time, setTime] = useState(0);
 
   useEffect(() => {
+    const TARGET_DURATION = 4 * 60 * 60 * 1000; // 4 hours in ms
+    let endTime = localStorage.getItem("flashSaleEndTime");
+
+    const now = Date.now();
+
+    if (!endTime || parseInt(endTime) <= now) {
+      endTime = now + TARGET_DURATION;
+      localStorage.setItem("flashSaleEndTime", endTime.toString());
+    } else {
+      endTime = parseInt(endTime);
+    }
+
+    const calculateRemaining = () => {
+      const remaining = Math.max(0, Math.floor((endTime - Date.now()) / 1000));
+      setTime(remaining);
+      return remaining;
+    };
+
+    calculateRemaining();
+
     const timer = setInterval(() => {
-      setTime((prev) => (prev > 0 ? prev - 1 : 0));
+      const remaining = calculateRemaining();
+      if (remaining <= 0) {
+        clearInterval(timer);
+      }
     }, 1000);
 
     return () => clearInterval(timer);

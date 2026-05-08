@@ -20,9 +20,11 @@ import {
 	Settings,
 	Coins,
 } from "lucide-react";
-import { getUserIdFromToken } from "@/utils/auth";
+import { getToken, getUserIdFromToken } from "@/utils/auth";
+import { API } from "@/utils/api";
+import { saveAddress } from "@/utils/user";
 
-const API_BASE = "https://mood-freshner-backend.onrender.com/api";
+const API_BASE = API;
 
 const EMPTY_ADDRESS = {
 	fullName: "",
@@ -52,13 +54,28 @@ function AddressModal({ initial, onSave, onClose }) {
 		return e;
 	};
 
-	const handleSave = () => {
+	const handleSave = async () => {
 		const e = validate();
+
 		if (Object.keys(e).length) {
 			setErrors(e);
 			return;
 		}
-		onSave(form);
+
+		try {
+			const token = getToken();
+			await saveAddress(form, token);
+
+			saveAddressToStorage(form);
+
+			localStorage.setItem("pincode", form.postalCode);
+
+			window.dispatchEvent(new Event("addressUpdated"));
+
+			onSave(form);
+		} catch (error) {
+			console.error(error);
+		}
 	};
 
 	const field = (label, key, placeholder, type = "text") => (
