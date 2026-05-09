@@ -594,7 +594,7 @@ export default function ProfilePage() {
 	useEffect(() => {
 		const token = localStorage.getItem("token");
 		if (!token) {
-			router.push("/login");
+			router.push("/");
 			return;
 		}
 
@@ -606,7 +606,7 @@ export default function ProfilePage() {
 				localStorage.setItem(userAddrKey, guestAddr);
 		}
 		if (!userId) {
-			router.push("/login");
+			router.push("/");
 			return;
 		}
 
