@@ -3,8 +3,9 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Bell, ArrowLeft } from "lucide-react";
+import { API } from "@/utils/api";
 
-const API_BASE = "https://mood-freshner-backend.onrender.com/api";
+const API_BASE = API;
 
 export default function NotificationsPage() {
   const [notifications, setNotifications] = useState([]);
@@ -12,24 +13,34 @@ export default function NotificationsPage() {
   const router = useRouter();
 
   useEffect(() => {
-    const fetchNotifications = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        const res = await fetch(`${API_BASE}/notifications`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const data = await res.json();
-        if (data.success) setNotifications(data.data);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
+  const fetchNotifications = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const user = JSON.parse(localStorage.getItem("user"));
+
+      const res = await fetch(
+        `${API_BASE}/notifications?userId=${user?._id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const data = await res.json();
+
+      if (data.success) {
+        setNotifications(data.data);
       }
-    };
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchNotifications();
-  }, []);
-
+  fetchNotifications();
+}, []);
   return (
     <div
       style={{

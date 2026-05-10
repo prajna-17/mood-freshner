@@ -314,20 +314,21 @@ export default function Header() {
 							<div className="flex items-center gap-3 text-slate-500">
 								<Mail size={14} />
 								<span className="text-xs font-medium">
-									hello@moodfresh.com
+									moodfreshdairy@gmail.com
 								</span>
 							</div>
 							<div className="flex items-center gap-3 text-slate-500">
 								<Phone size={14} />
 								<span className="text-xs font-medium">
-									+91 98765 43210
+									+91 88000 91914 <br />
+									+91 78959 59613
 								</span>
 							</div>
 						</div>
 
 						<div className="mt-8 pt-6 border-t border-slate-100">
 							<p className="text-[10px] text-slate-400 text-center font-medium">
-								© 2024 MoodFresh Dairy. All rights
+								© 2026 MoodFresh Dairy. All rights
 								reserved.
 							</p>
 						</div>

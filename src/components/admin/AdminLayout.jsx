@@ -82,6 +82,10 @@ export default function AdminLayout({ children }) {
         <Link href="/admin/coins" className="admin-link">
           Coins
         </Link>
+        
+         <Link href="/admin/contact" className="admin-link">
+          Contact
+        </Link>
       </aside>
 
       {/* MAIN CONTENT */}
