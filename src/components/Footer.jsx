@@ -52,9 +52,10 @@ export default function Footer() {
 								className=""
 							/>
 							<p className="text-white/60 text-sm leading-relaxed">
-								Farm fresh dairy, delivered with love.
-								Pure, natural, and straight from happy
-								farms to your doorstep.
+								 भरोसा जो हर बूंद में दिखे - देश से शुद्धता का वादा।
+							</p>
+							<p className="text-white/60 text-xs leading-relaxed">
+								 Experience the Real Taste of Fresh Dairy. Direct From Farm to Your Home.
 							</p>
 						</div>
 					</div>
@@ -96,6 +97,9 @@ export default function Footer() {
 					<p className="text-white/40 text-xs">
 						© 2025 MoodFresh. All rights reserved. Made with
 						🧀 in India.
+					</p>
+					<p className="text-white/40 text-xs">
+						 MOODFRESH FOOD AND BEVERAGES <br /> Village Taharpur, Bijnor (U.P.) - 246731
 					</p>
 
 					{/* Social icons moved here */}

@@ -13,6 +13,8 @@ import OurStory from "@/components/home/OurStory";
 import RecentlyPurchased from "@/components/home/RecentlyPurchased";
 import WhyChoose from "@/components/home/WhyChoose";
 import HomeReviewsSlider from "@/components/home/CustomerReviews";
+import OurPromise from "@/components/home/OurPromise";
+import SubscriptionDelivery from "@/components/home/Delivery";
 
 export default function Home() {
 	// 🔥 Always render immediately — products handle their own fetching
@@ -29,6 +31,8 @@ export default function Home() {
 			<OurStory />
 			<RecentlyPurchased />
 			<WhyChoose />
+			<OurPromise/>
+			<SubscriptionDelivery/>
 			<HomeReviewsSlider />
 		</>
 	);

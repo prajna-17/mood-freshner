@@ -59,7 +59,7 @@ export default function HomeReviewsSlider() {
 	};
 
 	return (
-		<section className="bg-slate-50 overflow-hidden pt-20">
+		<section className="bg-slate-50 overflow-hidden">
 			<div className="px-6 mb-8 flex items-end justify-between max-w-6xl mx-auto">
 				<div>
 					<h2 className="text-3xl font-extrabold text-[#0c1a4c] tracking-tight">
