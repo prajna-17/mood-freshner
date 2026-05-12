@@ -15,6 +15,7 @@ import WhyChoose from "@/components/home/WhyChoose";
 import HomeReviewsSlider from "@/components/home/CustomerReviews";
 import OurPromise from "@/components/home/OurPromise";
 import SubscriptionDelivery from "@/components/home/Delivery";
+import SubscribeSection from "@/components/home/Subscribe";
 
 export default function Home() {
 	// 🔥 Always render immediately — products handle their own fetching
@@ -34,6 +35,7 @@ export default function Home() {
 			<OurPromise/>
 			<SubscriptionDelivery/>
 			<HomeReviewsSlider />
+			<SubscribeSection/>
 		</>
 	);
 }
