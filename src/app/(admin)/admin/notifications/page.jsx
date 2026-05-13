@@ -1,8 +1,9 @@
 "use client";
 
+import { API } from "@/utils/api";
 import { useState, useEffect } from "react";
 
-const API_BASE = "https://mood-freshner-backend.onrender.com/api";
+const API_BASE = API;
 
 export default function AdminNotificationsPage() {
   const [notifications, setNotifications] = useState([]);

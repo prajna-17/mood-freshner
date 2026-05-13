@@ -101,6 +101,7 @@
   gap: 14px;
   z-index: 10;
   padding-top: 25px !important;
+  overflow-y: scroll;
 }
 
 .admin-link {
