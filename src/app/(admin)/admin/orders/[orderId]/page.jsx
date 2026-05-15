@@ -52,11 +52,21 @@ export default function AdminOrderDetails() {
       return;
     }
 
-    setOrder((prev) => ({
-      ...prev,
-      orderStatus: status,
-      isCompleted: status === "DELIVERED" || status === "CANCELLED",
-    }));
+    setOrder((prev) => {
+  const isDelivered = status === "DELIVERED";
+  const isCancelled = status === "CANCELLED";
+
+  return {
+    ...prev,
+    orderStatus: status,
+    isCompleted: isDelivered || isCancelled,
+    paymentStatus: isDelivered
+      ? prev.paymentMethod === "COD"
+        ? "PAID"
+        : "SUCCESS"
+      : "PENDING",
+  };
+});
   };
 
   const cancelOrder = async () => {
