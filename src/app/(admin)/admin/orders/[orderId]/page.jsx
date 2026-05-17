@@ -17,6 +17,15 @@ export default function AdminOrderDetails() {
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // Notification state
+  const [showNotifyModal, setShowNotifyModal] = useState(false);
+  const [notifyTitle, setNotifyTitle] = useState("");
+  const [notifyMessage, setNotifyMessage] = useState("");
+
+  // Payment tracking states
+  const [newAmountPaid, setNewAmountPaid] = useState("");
+  const [updatingPayment, setUpdatingPayment] = useState(false);
+
   useEffect(() => {
     loadOrder();
   }, []);
@@ -25,7 +34,7 @@ export default function AdminOrderDetails() {
     try {
       const res = await fetch(`${API}/orders/order-details/${orderId}`, {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("lebah-token")}`,
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
       const data = await res.json();
@@ -42,7 +51,7 @@ export default function AdminOrderDetails() {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("lebah-token")}`,
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
       body: JSON.stringify({ orderStatus: status }),
     });
@@ -76,7 +85,7 @@ export default function AdminOrderDetails() {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("lebah-token")}`,
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
       body: JSON.stringify({
         orderStatus: "CANCELLED",
@@ -101,6 +110,70 @@ export default function AdminOrderDetails() {
   const downloadInvoice = () => {
     window.open(`${API}/orders/invoice/${order._id}`, "_blank");
   };
+
+  const handleUpdatePayment = async () => {
+    if (newAmountPaid === "") return;
+    setUpdatingPayment(true);
+    try {
+      const res = await fetch(`${API}/orders/payment/${order._id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify({ amountPaid: Number(newAmountPaid) }),
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        alert("Payment details updated!");
+        setOrder(data.data);
+        setNewAmountPaid("");
+      } else {
+        alert("Failed to update payment details: " + (data.message || ""));
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error updating payment");
+    } finally {
+      setUpdatingPayment(false);
+    }
+  };
+
+  const handleSendNotification = async () => {
+    if (!notifyTitle || !notifyMessage) {
+      alert("Please enter title and message");
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API}/notifications`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify({
+          userId: order.user,
+          title: notifyTitle,
+          message: notifyMessage,
+        }),
+      });
+
+      if (res.ok) {
+        alert("Notification sent successfully");
+        setShowNotifyModal(false);
+        setNotifyTitle("");
+        setNotifyMessage("");
+      } else {
+        alert("Failed to send notification");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error sending notification");
+    }
+  };
+
   if (loading) return <div style={{ padding: 30 }}>Loading...</div>;
   if (!order) return <div style={{ padding: 30 }}>Order not found</div>;
 
@@ -119,6 +192,14 @@ export default function AdminOrderDetails() {
               <div>Transaction ID: {order.merchantTransactionId}</div>
             )}
             <div>Customer ID: {order.user}</div>
+            <div style={{ marginTop: 4, fontWeight: "bold", color: order.orderType === "BULK_ADVANCE" ? "#b45309" : "#0284c7" }}>
+              Order Type: {order.orderType === "BULK_ADVANCE" ? "📅 ADVANCE BULK BOOKING" : "🛍️ STANDARD ORDER"}
+            </div>
+            {order.orderType === "BULK_ADVANCE" && order.scheduledDeliveryDate && (
+              <div style={{ fontWeight: "bold", color: "#b45309" }}>
+                Scheduled Delivery Date: {new Date(order.scheduledDeliveryDate).toLocaleDateString("en-IN")}
+              </div>
+            )}
           </div>
 
           <hr style={{ margin: "12px 0" }} />
@@ -128,6 +209,19 @@ export default function AdminOrderDetails() {
             <span>Total: ₹{order.totalAmount}</span>
             <span>{getPaymentMethodLabel(order.paymentMethod)}</span>
           </div>
+
+          {order.orderType === "BULK_ADVANCE" && (
+            <div style={{ fontSize: 13, margin: "8px 0", padding: 10, background: "#fef3c7", borderRadius: 8 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
+                <span>Amount Paid:</span>
+                <span style={{ fontWeight: "bold", color: "#16a34a" }}>₹{order.amountPaid || 0}</span>
+              </div>
+              <div style={{ display: "flex", justifyContent: "space-between" }}>
+                <span>Balance Due:</span>
+                <span style={{ fontWeight: "bold", color: "#dc2626" }}>₹{order.balanceDue || 0}</span>
+              </div>
+            </div>
+          )}
 
           <div className="product-sub">
             <span>Status: {order.orderStatus}</span>
@@ -198,6 +292,9 @@ export default function AdminOrderDetails() {
           </select>
 
           <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
+            <button className="primary-btn small" onClick={() => setShowNotifyModal(true)}>
+              Notify User
+            </button>
             <button className="primary-btn small" onClick={downloadInvoice}>
               Download Invoice
             </button>
@@ -226,8 +323,66 @@ export default function AdminOrderDetails() {
               Back
             </button>
           </div>
+
+          {order.orderType === "BULK_ADVANCE" && (
+            <div style={{ marginTop: 20, borderTop: "1px solid #eee", paddingTop: 15 }}>
+              <h4 style={{ fontSize: 14, marginBottom: 8, color: "#b45309" }}>Payment Tracking & Updates</h4>
+              <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+                <input
+                  type="number"
+                  placeholder="Enter total amount paid"
+                  className="search-input"
+                  value={newAmountPaid}
+                  onChange={(e) => setNewAmountPaid(e.target.value)}
+                  style={{ maxWidth: 220, margin: 0 }}
+                />
+                <button
+                  className="primary-btn small"
+                  onClick={handleUpdatePayment}
+                  disabled={updatingPayment}
+                  style={{ background: "#b45309" }}
+                >
+                  {updatingPayment ? "Updating..." : "Update Amount Paid"}
+                </button>
+              </div>
+              <p style={{ fontSize: 11, color: "#666", marginTop: 4 }}>
+                * Balance Due will automatically update to Total minus Amount Paid.
+              </p>
+            </div>
+          )}
         </div>
       </div>
+
+      {showNotifyModal && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h2>Notify User</h2>
+            <input
+              type="text"
+              placeholder="Notification Title"
+              className="search-input"
+              value={notifyTitle}
+              onChange={(e) => setNotifyTitle(e.target.value)}
+              style={{ width: "100%", marginBottom: 10, marginTop: 10 }}
+            />
+            <textarea
+              placeholder="Notification Message"
+              className="search-input"
+              value={notifyMessage}
+              onChange={(e) => setNotifyMessage(e.target.value)}
+              style={{ width: "100%", height: 100, marginBottom: 10, resize: "none" }}
+            />
+            <div style={{ display: "flex", gap: 10 }}>
+              <button className="primary-btn" onClick={handleSendNotification}>
+                Send
+              </button>
+              <button className="inactive-btn" onClick={() => setShowNotifyModal(false)}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

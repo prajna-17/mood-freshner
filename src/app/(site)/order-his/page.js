@@ -16,7 +16,8 @@ import {
 import { getUserIdFromToken } from "@/utils/auth";
 import { getPaymentMethodLabel, getPaymentStatusLabel } from "@/utils/payment";
 
-const API_BASE = "https://mood-freshner-backend.onrender.com/api";
+import { API } from "@/utils/api";
+const API_BASE = API;
 // ── Status config ─────────────────────────────────────────────────────────────
 const STATUS_CONFIG = {
 	PLACED: {
@@ -388,6 +389,11 @@ export default function OrderHistoryPage() {
 												·{" "}
 												{getPaymentStatusLabel(
 													order.paymentStatus,
+												)}
+												{order.orderType === "BULK_ADVANCE" && (
+													<span className="ml-2 text-[10px] bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded font-black">
+														📅 ADVANCE
+													</span>
 												)}
 											</p>
 										</div>

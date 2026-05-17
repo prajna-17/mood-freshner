@@ -21,7 +21,8 @@ import {
 import { getUserIdFromToken } from "@/utils/auth";
 import { useRouter } from "next/navigation";
 import { Suspense } from "react";
-const API_BASE = "https://mood-freshner-backend.onrender.com/api"; // ─── Status → tracker step index ─────────────────────────────────────────────
+import { API } from "@/utils/api";
+const API_BASE = API; // ─── Status → tracker step index ─────────────────────────────────────────────
 const STATUS_INDEX = {
   PLACED: 0,
   CONFIRMED: 1,

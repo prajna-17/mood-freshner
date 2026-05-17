@@ -27,7 +27,7 @@ export default function AdminOrders() {
     try {
       const res = await fetch(`${API}/orders`, {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("lebah-token")}`,
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
 
@@ -43,7 +43,7 @@ export default function AdminOrders() {
     try {
       const res = await fetch(`${API}/orders/notifications`, {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("lebah-token")}`,
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
 
@@ -96,6 +96,8 @@ export default function AdminOrders() {
       return String(order.paymentMethod || "").includes("ONLINE");
     if (filter === "COINS")
       return String(order.paymentMethod || "").includes("COINS");
+    if (filter === "ADVANCE_BULK")
+      return order.orderType === "BULK_ADVANCE";
     return true; // ALL
   });
 
@@ -181,7 +183,7 @@ export default function AdminOrders() {
                           await fetch(`${API}/orders/mark-notified/${n.id}`, {
                             method: "PATCH",
                             headers: {
-                              Authorization: `Bearer ${localStorage.getItem("lebah-token")}`,
+                              Authorization: `Bearer ${localStorage.getItem("token")}`,
                             },
                           });
 
@@ -206,7 +208,7 @@ export default function AdminOrders() {
       {/* FILTER BUTTONS */}
       <div
         className="cat-top-row"
-        style={{ gap: 6, justifyContent: "flex-start" }}
+        style={{ gap: 6, justifyContent: "flex-start", flexWrap: "wrap" }}
       >
         <button className="primary-btn small" onClick={() => setFilter("ALL")}>
           All
@@ -232,6 +234,13 @@ export default function AdminOrders() {
         >
           Online
         </button>
+        <button
+          className="primary-btn small"
+          onClick={() => setFilter("ADVANCE_BULK")}
+          style={{ background: "#b45309" }}
+        >
+          📅 Advance Bulk
+        </button>
       </div>
 
       {/* ORDERS LIST */}
@@ -239,7 +248,14 @@ export default function AdminOrders() {
         {filteredOrders.map((order) => (
           <div key={order._id} className="product-card">
             <div className="product-body">
-              <div className="product-title">Order #{order._id.slice(-6)}</div>
+              <div className="product-title" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <span>Order #{order._id.slice(-6)}</span>
+                {order.orderType === "BULK_ADVANCE" && (
+                  <span style={{ fontSize: 10, background: "#fef3c7", color: "#b45309", padding: "2px 6px", borderRadius: 4, fontWeight: "bold" }}>
+                    📅 ADVANCE BULK
+                  </span>
+                )}
+              </div>
 
               <div className="product-sub">
                 <span>Total: ₹{order.totalAmount}</span>

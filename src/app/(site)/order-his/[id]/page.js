@@ -25,7 +25,8 @@ import {
   isPaymentSuccessful,
 } from "@/utils/payment";
 
-const API_BASE = "https://mood-freshner-backend.onrender.com/api";
+import { API } from "@/utils/api";
+const API_BASE = API;
 // ── Tracker steps ─────────────────────────────────────────────────────────────
 const STATUS_INDEX = {
   PLACED: 0,
@@ -416,6 +417,19 @@ export default function OrderDetailPage() {
                 </p>
               </div>
             </div>
+            {order.orderType === "BULK_ADVANCE" && (
+              <div className="mt-4 pt-3 border-t border-dashed border-gray-200">
+                <p className="text-xs text-gray-400 font-bold">Order Type</p>
+                <p className="text-sm font-black text-amber-600 mt-0.5">
+                  📅 Advance Bulk Booking
+                </p>
+                {order.scheduledDeliveryDate && (
+                  <p className="text-xs text-gray-500 font-semibold mt-1">
+                    Scheduled Delivery: <span className="font-bold text-gray-700">{formatDateShort(order.scheduledDeliveryDate)}</span>
+                  </p>
+                )}
+              </div>
+            )}
           </Section>
 
           {/* ── Tracker ── */}
@@ -615,11 +629,27 @@ export default function OrderDetailPage() {
                 <span className="font-bold text-emerald-500">Included</span>
               </div>
               <div className="flex justify-between text-base text-gray-800 pt-1">
-                <span className="font-black">Total Paid</span>
+                <span className="font-black">Total Amount</span>
                 <span className="font-black text-sky-600">
                   ₹{order.totalAmount?.toLocaleString()}
                 </span>
               </div>
+              {order.orderType === "BULK_ADVANCE" && (
+                <>
+                  <div className="flex justify-between text-sm text-emerald-600 pt-1">
+                    <span className="font-semibold">Amount Paid</span>
+                    <span className="font-bold">
+                      ₹{(order.amountPaid || 0).toLocaleString()}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-sm text-rose-500">
+                    <span className="font-semibold">Balance Due</span>
+                    <span className="font-bold">
+                      ₹{(order.balanceDue || 0).toLocaleString()}
+                    </span>
+                  </div>
+                </>
+              )}
             </div>
           </Section>
 

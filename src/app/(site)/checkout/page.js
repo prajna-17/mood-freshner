@@ -7,7 +7,8 @@ import { Suspense } from "react";
 import { saveAddress } from "@/utils/user";
 
 const DELIVERY_FEE = 99;
-const API_BASE = "https://mood-freshner-backend.onrender.com/api";
+import { API } from "@/utils/api";
+const API_BASE = API;
 console.log("API_BASE:", API_BASE);
 
 // ─── Address helpers (per-user, localStorage) — UNCHANGED ────────────────────
@@ -222,6 +223,10 @@ function CheckoutContent() {
 	const [availableCoins, setAvailableCoins] = useState(0);
 	const [useCoins, setUseCoins] = useState(false);
 
+	// Advance Bulk Booking states
+	const [orderType, setOrderType] = useState("STANDARD");
+	const [scheduledDeliveryDate, setScheduledDeliveryDate] = useState("");
+
 	// On mount: load items + saved address — UNCHANGED + coins load
 	useEffect(() => {
 		const storedItem = localStorage.getItem("checkoutItem");
@@ -307,6 +312,11 @@ function CheckoutContent() {
 			return;
 		}
 
+		if (orderType === "BULK_ADVANCE" && !scheduledDeliveryDate) {
+			setOrderError("Please select a scheduled delivery date for advance booking.");
+			return;
+		}
+
 		setPlacing(true);
 		setOrderError("");
 
@@ -366,6 +376,10 @@ function CheckoutContent() {
 					paymentMethod: resolvedPaymentMethod,
 					paymentStatus: resolvedPaymentStatus,
 					coinsUsed: coinsToApply,
+					totalAmount: total,
+					amountPaid: payment === "cod" ? coinsToApply : total,
+					orderType,
+					scheduledDeliveryDate: orderType === "BULK_ADVANCE" ? scheduledDeliveryDate : undefined,
 				}),
 			});
 
@@ -837,6 +851,49 @@ function CheckoutContent() {
 							</div>
 						</div>
 					</div>
+				</div>
+
+				{/* ── Advance Bulk Booking Section ── */}
+				<div className="pay-block bg-white rounded-3xl shadow-sm border border-sky-100 p-5">
+					<p className="text-base font-bold text-sky-800 mb-4 flex items-center gap-2">
+						<span>📦 Order Type</span>
+					</p>
+					
+					<div className="grid grid-cols-2 gap-3 mb-4">
+						<button
+							onClick={() => setOrderType("STANDARD")}
+							className={`rounded-2xl border px-3 py-4 text-center transition ${orderType === "STANDARD" ? "border-sky-500 bg-sky-50 font-bold text-sky-700" : "border-sky-100 bg-white text-gray-600"}`}
+						>
+							<div className="text-xl mb-1">🛍️</div>
+							<div className="text-sm">Standard</div>
+						</button>
+
+						<button
+							onClick={() => setOrderType("BULK_ADVANCE")}
+							className={`rounded-2xl border px-3 py-4 text-center transition ${orderType === "BULK_ADVANCE" ? "border-sky-500 bg-sky-50 font-bold text-sky-700" : "border-sky-100 bg-white text-gray-600"}`}
+						>
+							<div className="text-xl mb-1">📅</div>
+							<div className="text-sm">Advance Bulk</div>
+						</button>
+					</div>
+
+					{orderType === "BULK_ADVANCE" && (
+						<div className="flex flex-col gap-2 p-3 bg-amber-50/50 border border-amber-100 rounded-2xl animate-fadeUp">
+							<label className="text-xs font-semibold text-amber-700">
+								Scheduled Delivery Date
+							</label>
+							<input
+								type="date"
+								min={new Date(Date.now() + 86400000).toISOString().split("T")[0]}
+								value={scheduledDeliveryDate}
+								onChange={(e) => setScheduledDeliveryDate(e.target.value)}
+								className="rounded-xl border border-amber-200 bg-white px-3 py-2 text-sm outline-none focus:border-amber-400"
+							/>
+							<p className="text-[11px] text-amber-600/80">
+								* Prior reminders will be sent 1-2 days before the scheduled date.
+							</p>
+						</div>
+					)}
 				</div>
 
 				{/* ── Delivery Address — UNCHANGED ── */}
