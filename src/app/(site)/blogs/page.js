@@ -1,57 +1,33 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight, Calendar, User } from "lucide-react";
+import { API } from "@/utils/api";
 
 export const metadata = {
   title: "Blogs | MoodFresh",
   description: "Read our latest articles on dairy, health, and sustainable farming.",
 };
 
-export default function BlogsPage() {
-  const blogs = [
-    {
-      title: "The Incredible Health Benefits of A2 Milk",
-      desc: "Discover why A2 milk is considered superior for digestion and overall wellness compared to regular milk.",
-      image: "https://images.unsplash.com/photo-1550583724-b2692b85b150?auto=format&fit=crop&q=80",
-      date: "Oct 12, 2023",
-      author: "Dr. Sharma"
-    },
-    {
-      title: "Farm to Table: The MoodFresh Journey",
-      desc: "Take a behind-the-scenes look at how we ensure pure milk reaches your doorstep within hours of milking.",
-      image: "https://images.unsplash.com/photo-1500595046743-cd271d694d30?auto=format&fit=crop&q=80",
-      date: "Nov 05, 2023",
-      author: "Farm Team"
-    },
-    {
-      title: "Delicious Recipes Using Farm Fresh Dairy",
-      desc: "From creamy paneer to rich desserts, explore our favorite recipes you can make with MoodFresh products.",
-      image: "https://images.unsplash.com/photo-1588195538326-c5b1e9f80a1b?auto=format&fit=crop&q=80",
-      date: "Dec 20, 2023",
-      author: "Chef Aditi"
-    },
-    {
-      title: "Why Sustainable Farming Matters",
-      desc: "How ethical practices and caring for our cows leads to better milk and a healthier planet.",
-      image: "https://images.unsplash.com/photo-1596733430284-f7437764b1a9?auto=format&fit=crop&q=80",
-      date: "Jan 15, 2024",
-      author: "Sustainability Team"
-    },
-    {
-      title: "Understanding Milk Pasteurization",
-      desc: "A simple guide to how we make sure your milk is perfectly safe without losing its natural nutrients.",
-      image: "https://images.unsplash.com/photo-1563636619-e9143da7973b?auto=format&fit=crop&q=80",
-      date: "Feb 28, 2024",
-      author: "Quality Control"
-    },
-    {
-      title: "The Secret to Perfect Homemade Curd",
-      desc: "Struggling to set the perfect curd? Follow our foolproof guide using MoodFresh pure milk.",
-      image: "https://images.unsplash.com/photo-1728910107657-a1806c4e22bf?auto=format&fit=crop&q=80",
-      date: "Mar 10, 2024",
-      author: "Priya Singh"
-    }
-  ];
+async function getBlogs() {
+  try {
+    const res = await fetch(`${API}/blogs?status=PUBLISHED`, {
+      cache: "no-store",
+    });
+    if (!res.ok) return [];
+    const json = await res.json();
+    return json.statusCode === 200 ? json.data : [];
+  } catch (error) {
+    console.error("Failed to fetch blogs:", error);
+    return [];
+  }
+}
+
+export default async function BlogsPage() {
+  const blogs = await getBlogs();
+
+  // Pick the first blog as the featured post (if exists)
+  const featuredBlog = blogs.length > 0 ? blogs[0] : null;
+  const regularBlogs = blogs.length > 1 ? blogs.slice(1) : [];
 
   return (
     <div className="min-h-screen bg-gray-50 pb-4 font-['DM_Sans',sans-serif]">
@@ -85,69 +61,102 @@ export default function BlogsPage() {
       {/* ── Main Content ── */}
       <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-20">
         
-        {/* Featured Post */}
-        <div className="bg-white rounded-3xl shadow-xl p-4 md:p-6 mb-16 flex flex-col md:flex-row gap-8 group cursor-pointer hover:shadow-2xl transition-shadow border border-gray-100">
-          <div className="md:w-1/2 relative h-64 md:h-[400px] rounded-2xl overflow-hidden">
-            <Image 
-              src="https://images.unsplash.com/photo-1550583724-b2692b85b150?auto=format&fit=crop&q=80" 
-              alt="Featured Post" 
-              fill
-              className="object-cover transition-transform duration-700 group-hover:scale-105"
-            />
-            <div className="absolute top-4 left-4 bg-orange-500 text-white px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider shadow-md">
-              Featured
-            </div>
+        {blogs.length === 0 ? (
+          <div className="bg-white rounded-3xl shadow-xl p-12 text-center text-gray-500 border border-gray-100">
+            <h2 className="text-2xl font-bold mb-2 text-gray-800">No Articles Yet</h2>
+            <p>Check back soon for insights and updates from MoodFresh!</p>
           </div>
-          <div className="md:w-1/2 flex flex-col justify-center px-4 md:px-8 pb-4 md:pb-0">
-            <div className="flex items-center gap-4 text-sm text-gray-500 mb-4">
-              <span className="flex items-center"><Calendar size={14} className="mr-1" /> Oct 12, 2023</span>
-              <span className="flex items-center"><User size={14} className="mr-1" /> Dr. Sharma</span>
-            </div>
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 group-hover:text-blue-700 transition-colors">
-              The Incredible Health Benefits of Pure Farm Milk
-            </h2>
-            <p className="text-gray-600 mb-8 leading-relaxed text-lg">
-              Discover why farm-fresh milk is considered superior for digestion and overall wellness compared to heavily processed regular milk. We break down the science...
-            </p>
-            <div className="inline-flex items-center text-blue-600 font-semibold text-lg group-hover:text-blue-800 transition-colors">
-              Read Article <ArrowRight size={20} className="ml-2 transform group-hover:translate-x-1 transition-transform" />
-            </div>
-          </div>
-        </div>
+        ) : (
+          <>
+            {/* Featured Post */}
+            {featuredBlog && (
+              <div className="bg-white rounded-3xl shadow-xl p-4 md:p-6 mb-16 flex flex-col md:flex-row gap-8 group cursor-pointer hover:shadow-2xl transition-shadow border border-gray-100">
+                <div className="md:w-1/2 relative h-64 md:h-[400px] rounded-2xl overflow-hidden bg-gray-100 flex items-center justify-center">
+                  {featuredBlog.images && featuredBlog.images.length > 0 ? (
+                    <Image 
+                      src={featuredBlog.images[0]} 
+                      alt={featuredBlog.title} 
+                      fill
+                      className="object-cover transition-transform duration-700 group-hover:scale-105"
+                    />
+                  ) : (
+                    <Image 
+                      src="https://images.unsplash.com/photo-1550583724-b2692b85b150?auto=format&fit=crop&q=80" 
+                      alt="Featured Post Placeholder" 
+                      fill
+                      className="object-cover transition-transform duration-700 group-hover:scale-105"
+                    />
+                  )}
+                  <div className="absolute top-4 left-4 bg-orange-500 text-white px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider shadow-md">
+                    Featured
+                  </div>
+                </div>
+                <div className="md:w-1/2 flex flex-col justify-center px-4 md:px-8 pb-4 md:pb-0">
+                  <div className="flex items-center gap-4 text-sm text-gray-500 mb-4">
+                    <span className="flex items-center"><Calendar size={14} className="mr-1" /> {new Date(featuredBlog.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</span>
+                    <span className="flex items-center"><User size={14} className="mr-1" /> {featuredBlog.author || "Admin"}</span>
+                  </div>
+                  <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 group-hover:text-blue-700 transition-colors line-clamp-2">
+                    {featuredBlog.title}
+                  </h2>
+                  <p className="text-gray-600 mb-8 leading-relaxed text-lg line-clamp-3">
+                    {featuredBlog.content}
+                  </p>
+                  <div className="inline-flex items-center text-blue-600 font-semibold text-lg group-hover:text-blue-800 transition-colors mt-auto">
+                    Read Article <ArrowRight size={20} className="ml-2 transform group-hover:translate-x-1 transition-transform" />
+                  </div>
+                </div>
+              </div>
+            )}
 
-        {/* Blog Grid */}
-        <div className="text-center mb-10">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">Latest Articles</h2>
-        </div>
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {blogs.map((blog, idx) => (
-            <div key={idx} className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all hover:-translate-y-1 border border-gray-100 group flex flex-col">
-              <div className="relative h-56 w-full overflow-hidden">
-                <Image 
-                  src={blog.image} 
-                  alt={blog.title} 
-                  fill
-                  className="object-cover transition-transform duration-500 group-hover:scale-110"
-                />
-              </div>
-              <div className="p-6 flex flex-col flex-grow">
-                <div className="flex items-center justify-between text-xs text-gray-500 mb-3">
-                  <span className="flex items-center"><Calendar size={12} className="mr-1" /> {blog.date}</span>
-                  <span className="flex items-center"><User size={12} className="mr-1" /> {blog.author}</span>
+            {/* Blog Grid */}
+            {regularBlogs.length > 0 && (
+              <>
+                <div className="text-center mb-10">
+                  <h2 className="text-3xl font-bold text-gray-900 mb-4">Latest Articles</h2>
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-blue-700 transition-colors line-clamp-2">
-                  {blog.title}
-                </h3>
-                <p className="text-gray-600 text-sm mb-6 flex-grow line-clamp-3">
-                  {blog.desc}
-                </p>
-                <div className="inline-flex items-center text-orange-600 font-medium text-sm group-hover:text-orange-700 transition-colors mt-auto">
-                  Read More <ArrowRight size={16} className="ml-1 transform group-hover:translate-x-1 transition-transform" />
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {regularBlogs.map((blog) => (
+                    <div key={blog._id} className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all hover:-translate-y-1 border border-gray-100 group flex flex-col">
+                      <div className="relative h-56 w-full overflow-hidden bg-gray-100 flex items-center justify-center">
+                        {blog.images && blog.images.length > 0 ? (
+                          <Image 
+                            src={blog.images[0]} 
+                            alt={blog.title} 
+                            fill
+                            className="object-cover transition-transform duration-500 group-hover:scale-110"
+                          />
+                        ) : (
+                          <Image 
+                            src="https://images.unsplash.com/photo-1596733430284-f7437764b1a9?auto=format&fit=crop&q=80" 
+                            alt="Placeholder" 
+                            fill
+                            className="object-cover transition-transform duration-500 group-hover:scale-110"
+                          />
+                        )}
+                      </div>
+                      <div className="p-6 flex flex-col flex-grow">
+                        <div className="flex items-center justify-between text-xs text-gray-500 mb-3">
+                          <span className="flex items-center"><Calendar size={12} className="mr-1" /> {new Date(blog.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</span>
+                          <span className="flex items-center"><User size={12} className="mr-1" /> {blog.author || "Admin"}</span>
+                        </div>
+                        <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-blue-700 transition-colors line-clamp-2">
+                          {blog.title}
+                        </h3>
+                        <p className="text-gray-600 text-sm mb-6 flex-grow line-clamp-3">
+                          {blog.content}
+                        </p>
+                        <div className="inline-flex items-center text-orange-600 font-medium text-sm group-hover:text-orange-700 transition-colors mt-auto">
+                          Read More <ArrowRight size={16} className="ml-1 transform group-hover:translate-x-1 transition-transform" />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              </div>
-            </div>
-          ))}
-        </div>
+              </>
+            )}
+          </>
+        )}
 
       </main>
     </div>
