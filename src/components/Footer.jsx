@@ -23,6 +23,7 @@ const footerLinks = {
 		{ label: "Order History", href: "/order-his" },
 		{ label: "Notifications", href: "/notifications" },
 		{ label: "Shopping Cart", href: "/cart" },
+		{ label: "Delivery Partner Login", href: "/delivery/login" },
 	],
 };
 

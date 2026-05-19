@@ -60,6 +60,13 @@ export default function AdminHome() {
         >
           Manage Products
         </button>
+        <button
+          className="dash-btn"
+          onClick={() => router.push("/admin/delivery-boys")}
+          style={{ background: "#1e3a5f", color: "#fff" }}
+        >
+          🛵 Delivery Boys
+        </button>
       </div>
 
       {/* STAT CARDS */}

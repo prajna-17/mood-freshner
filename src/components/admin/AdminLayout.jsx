@@ -71,6 +71,10 @@ export default function AdminLayout({ children }) {
           Orders
         </Link>
 
+        <Link href="/admin/delivery-boys" className="admin-link">
+          🛵 Delivery Boys
+        </Link>
+
         <Link href="/admin/create-admin" className="admin-link">
           Create Admin
         </Link>
