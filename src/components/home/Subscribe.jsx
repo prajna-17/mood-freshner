@@ -6,24 +6,45 @@ import {
 	ArrowRight,
 	CheckCircle2,
 } from "lucide-react";
+import { API } from "@/utils/api";
 
 export default function SubscribeSectionCompact() {
 	const [email, setEmail] = useState("");
 	const [subscribed, setSubscribed] = useState(false);
+	const [loading, setLoading] = useState(false);
+	const [message, setMessage] = useState("");
 
-	const handleSubmit = (e) => {
+	const handleSubmit = async (e) => {
 		e.preventDefault();
 
 		if (!email) return;
 
-		// API CALL HERE
-
-		setSubscribed(true);
-		setEmail("");
-
-		setTimeout(() => {
-			setSubscribed(false);
-		}, 3000);
+		setLoading(true);
+		try {
+			const res = await fetch(`${API}/subscribers`, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({ email }),
+			});
+			const data = await res.json();
+			if (data.success) {
+				setSubscribed(true);
+				setMessage(data.message || "Successfully subscribed!");
+				setEmail("");
+				setTimeout(() => {
+					setSubscribed(false);
+					setMessage("");
+				}, 4000);
+			} else {
+				alert(data.message || "Something went wrong. Please try again.");
+			}
+		} catch (error) {
+			alert("Failed to connect to server. Please try again later.");
+		} finally {
+			setLoading(false);
+		}
 	};
 
 	return (
@@ -73,14 +94,17 @@ export default function SubscribeSectionCompact() {
 
 						<button
 							type="submit"
-							className="group w-full h-13 rounded-2xl bg-[#fb923c] text-white font-bold text-sm flex items-center justify-center gap-2 active:scale-95 transition-all shadow-lg p-2"
+							disabled={loading}
+							className="group w-full h-13 rounded-2xl bg-[#fb923c] text-white font-bold text-sm flex items-center justify-center gap-2 active:scale-95 transition-all shadow-lg p-2 disabled:opacity-50"
 						>
-							Subscribe Now
+							{loading ? "Subscribing..." : "Subscribe Now"}
 
-							<ArrowRight
-								size={16}
-								className="group-hover:translate-x-1 transition-transform"
-							/>
+							{!loading && (
+								<ArrowRight
+									size={16}
+									className="group-hover:translate-x-1 transition-transform"
+								/>
+							)}
 						</button>
 					</form>
 
@@ -89,7 +113,7 @@ export default function SubscribeSectionCompact() {
 						<div className="mt-4 flex items-center gap-2 rounded-2xl bg-green-500/10 border border-green-400/20 px-4 py-3 text-green-300 text-sm font-medium">
 							<CheckCircle2 size={16} />
 
-							Successfully subscribed!
+							{message}
 						</div>
 					)}
 

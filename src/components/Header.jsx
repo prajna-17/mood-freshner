@@ -23,17 +23,67 @@ import {
 	Instagram,
 	Facebook,
 	Twitter,
+	LogOut,
+	Zap,
 } from "lucide-react";
 import { usePWAInstall } from "@/hooks/usePWAInstall";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import LoginModal from "@/components/LoginModal";
 
 export default function Header() {
+	const router = useRouter();
 	const [scrolled, setScrolled] = useState(false);
 	const [cartBump, setCartBump] = useState(false);
 	const [bellShake, setBellShake] = useState(false);
 	const [time, setTime] = useState("");
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
+	const [isLoggedIn, setIsLoggedIn] = useState(false);
+	const [openLogin, setOpenLogin] = useState(false);
 	const { install, isInstallable, isInstalled } = usePWAInstall();
+
+	useEffect(() => {
+		if (typeof window !== "undefined") {
+			const token = localStorage.getItem("token");
+			setIsLoggedIn(!!token);
+		}
+	}, [isMenuOpen]);
+
+	const handleLogout = () => {
+		if (typeof window !== "undefined") {
+			try {
+				const token = localStorage.getItem("token");
+				if (token) {
+					const payload = JSON.parse(atob(token.split(".")[1]));
+					const userId = payload.userId;
+					if (userId) {
+						localStorage.removeItem(`cart_${userId}`);
+						localStorage.removeItem(`address_${userId}`);
+					}
+				}
+			} catch (e) {}
+			localStorage.removeItem("token");
+			localStorage.removeItem("user");
+			localStorage.removeItem("cart_guest");
+			localStorage.removeItem("pincode");
+			localStorage.removeItem("userCoins");
+			window.dispatchEvent(new Event("storage"));
+			setIsLoggedIn(false);
+			setIsMenuOpen(false);
+			window.location.href = "/";
+		}
+	};
+
+	const handleSubscriptionClick = (e) => {
+		e.preventDefault();
+		if (!isLoggedIn) {
+			setIsMenuOpen(false);
+			setOpenLogin(true);
+		} else {
+			setIsMenuOpen(false);
+			router.push("/profile");
+		}
+	};
 
 	// Shrink on scroll
 	useEffect(() => {
@@ -160,7 +210,7 @@ export default function Header() {
 				<div
 					className="relative flex items-center justify-center px-4"
 					style={{
-						height: scrolled ? 52 : 60,
+						height: scrolled ? 44 : 50,
 						transition:
 							"height 0.3s cubic-bezier(.22,1,.36,1)",
 					}}
@@ -181,8 +231,8 @@ export default function Header() {
 						<Image
 							src="/img/logo7.png"
 							alt="MoodFresh"
-							width={scrolled ? 120 : 140}
-							height={scrolled ? 34 : 38}
+							width={scrolled ? 90 : 110}
+							height={scrolled ? 26 : 30}
 							className="object-contain"
 							style={{
 								transition: "width 0.3s, height 0.3s",
@@ -234,24 +284,24 @@ export default function Header() {
 			>
 				<div className="h-full flex flex-col">
 					{/* Sidebar Header */}
-					<div className="p-6 bg-gradient-to-br from-[#0c1a4c] to-[#1a3a8a] text-white relative overflow-hidden">
-						<div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-16 -mt-16 blur-2xl" />
-						<div className="relative z-10 flex items-center justify-between mb-4">
+					<div className="py-4 px-5 bg-gradient-to-br from-[#0c1a4c] to-[#1a3a8a] text-white relative overflow-hidden">
+						<div className="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-full -mr-12 -mt-12 blur-xl" />
+						<div className="relative z-10 flex items-center justify-between mb-2">
 							<Image
 								src="/img/logo7.png"
 								alt="MoodFresh"
-								width={120}
-								height={32}
-								className=""
+								width={95}
+								height={26}
+								className="object-contain"
 							/>
 							<button
 								onClick={() => setIsMenuOpen(false)}
-								className="p-2 bg-white/10 hover:bg-white/20 rounded-full text-white transition-all duration-300"
+								className="p-1.5 bg-white/10 hover:bg-white/20 rounded-full text-white transition-all duration-300"
 							>
-								<X size={20} />
+								<X size={16} />
 							</button>
 						</div>
-						<p className="text-white/60 text-xs font-medium tracking-widest uppercase">
+						<p className="text-white/60 text-[9px] font-bold tracking-widest uppercase">
 							Premium Dairy Experience
 						</p>
 					</div>
@@ -326,6 +376,43 @@ export default function Header() {
 							</div>
 						</div>
 
+						<div className="mt-5 space-y-2">
+							<button
+								onClick={handleSubscriptionClick}
+								className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-bold text-sm text-white transition-all duration-300 active:scale-[0.98] shadow-md shadow-amber-500/10 hover:shadow-amber-500/20"
+								style={{
+									background: "linear-gradient(135deg, #f59e0b 0%, #f97316 100%)",
+								}}
+							>
+								<Zap size={15} strokeWidth={2.5} />
+								<span>My Subscription</span>
+							</button>
+
+							{isLoggedIn ? (
+								<button
+									onClick={handleLogout}
+									className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-bold text-sm text-slate-700 bg-slate-100 hover:bg-slate-200 transition-all duration-300 active:scale-[0.98] border border-slate-200/60"
+								>
+									<LogOut size={15} strokeWidth={2.5} className="text-slate-500" />
+									<span>Logout</span>
+								</button>
+							) : (
+								<button
+									onClick={() => {
+										setIsMenuOpen(false);
+										setOpenLogin(true);
+									}}
+									className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-bold text-sm text-white transition-all duration-300 active:scale-[0.98] shadow-md shadow-blue-900/10 hover:shadow-blue-900/20"
+									style={{
+										background: "linear-gradient(135deg, #0c1a4c 0%, #1a3a8a 100%)",
+									}}
+								>
+									<User size={15} strokeWidth={2.5} />
+									<span>Login / Register</span>
+								</button>
+							)}
+						</div>
+
 						<div className="mt-8 pt-6 border-t border-slate-100">
 							<p className="text-[10px] text-slate-400 text-center font-medium">
 								© 2026 MoodFresh Dairy. All rights
@@ -335,6 +422,7 @@ export default function Header() {
 					</div>
 				</div>
 			</div>
+			<LoginModal isOpen={openLogin} onClose={() => setOpenLogin(false)} />
 		</>
 	);
 }
