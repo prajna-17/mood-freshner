@@ -71,6 +71,14 @@ export default function AdminLayout({ children }) {
           Orders
         </Link>
 
+        <Link href="/admin/vendors" className="admin-link">
+          🤝 Vendors
+        </Link>
+
+        <Link href="/admin/purchases" className="admin-link">
+          🛒 Daily Purchases
+        </Link>
+
         <Link href="/admin/delivery-boys" className="admin-link">
           🛵 Delivery Boys
         </Link>
