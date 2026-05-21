@@ -204,6 +204,18 @@ function AddressModal({ initial, onSave, onClose }) {
 	);
 }
 
+// ─── Razorpay script loader ──────────────────────────────────────────────────
+function loadRazorpayScript() {
+	return new Promise((resolve) => {
+		if (window.Razorpay) { resolve(true); return; }
+		const script = document.createElement("script");
+		script.src = "https://checkout.razorpay.com/v1/checkout.js";
+		script.onload = () => resolve(true);
+		script.onerror = () => resolve(false);
+		document.body.appendChild(script);
+	});
+}
+
 // ─── Main Checkout Page ───────────────────────────────────────────────────────
 function CheckoutContent() {
 	const router = useRouter();
@@ -292,11 +304,11 @@ function CheckoutContent() {
 
 	const resolvedPaymentStatus = isFullyPaidByCoins ? "SUCCESS" : "PENDING";
 
-	// ── Place Order — UPDATED to deduct coins if used ──────────────────────────
+	// ── Place Order — handles COD, Coins, and Razorpay online payment ─────────
 	const handlePlaceOrder = async () => {
 		if (!address) {
 			setOrderError("Please add your delivery address to continue");
-			setShowModal(true); // optional: auto open form
+			setShowModal(true);
 			return;
 		}
 		const userPincode = address?.postalCode;
@@ -323,7 +335,7 @@ function CheckoutContent() {
 		try {
 			const token = localStorage.getItem("token");
 
-			// ── NEW: Deduct coins from backend BEFORE placing order ────────────────
+			// ── Deduct coins from backend BEFORE placing order ────────────────────
 			if (useCoins && coinsToApply > 0) {
 				const deductRes = await fetch(
 					`${API_BASE}/users/coins/deduct`,
@@ -342,7 +354,6 @@ function CheckoutContent() {
 						deductData.message || "Failed to apply coins",
 					);
 
-				// Update local cache
 				const newBalance =
 					deductData.data?.remainingCoins ??
 					availableCoins - coinsToApply;
@@ -350,19 +361,152 @@ function CheckoutContent() {
 				setAvailableCoins(newBalance);
 			}
 
-			// ── Existing order placement logic — UNCHANGED ─────────────────────────
-			const endpoint = isFullyPaidByCoins
-				? `${API_BASE}/orders/create-cod`
-				: payment === "cod"
-					? `${API_BASE}/orders/create-cod`
-					: `${API_BASE}/orders/create-pending`;
-
 			const products = cartItems.map((item) => ({
 				product: item.productId,
 				quantity: item.qty,
 				color: item.color,
 				size: item.size,
 			}));
+
+			// ── ONLINE PAYMENT: Full Razorpay flow ────────────────────────────────
+			if (!isFullyPaidByCoins && payment === "online") {
+				// 1. Load Razorpay SDK
+				const scriptLoaded = await loadRazorpayScript();
+				if (!scriptLoaded) {
+					throw new Error(
+						"Failed to load payment gateway. Check your internet connection.",
+					);
+				}
+
+				// 2. Create pending order in our backend
+				const pendingRes = await fetch(
+					`${API_BASE}/orders/create-pending`,
+					{
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json",
+							Authorization: `Bearer ${token}`,
+						},
+						body: JSON.stringify({
+							products,
+							shippingAddress: address,
+							paymentMethod: resolvedPaymentMethod,
+							paymentStatus: "PENDING",
+							coinsUsed: coinsToApply,
+							totalAmount: total,
+							amountPaid: coinsToApply,
+							orderType,
+							scheduledDeliveryDate:
+								orderType === "BULK_ADVANCE"
+									? scheduledDeliveryDate
+									: undefined,
+						}),
+					},
+				);
+				const pendingData = await pendingRes.json();
+				if (!pendingRes.ok)
+					throw new Error(
+						pendingData.message || "Failed to create order",
+					);
+
+				const orderId = pendingData.data?.orderId;
+				const orderAmount = pendingData.data?.amount ?? total;
+
+				// 3. Create Razorpay order on backend
+				const rpOrderRes = await fetch(
+					`${API_BASE}/razorpay/create-order`,
+					{
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json",
+							Authorization: `Bearer ${token}`,
+						},
+						body: JSON.stringify({ amount: orderAmount }),
+					},
+				);
+				const rpOrderData = await rpOrderRes.json();
+				if (!rpOrderRes.ok || !rpOrderData.success)
+					throw new Error(
+						rpOrderData.message || "Failed to initiate payment",
+					);
+
+				// 4. Fetch public Razorpay key from backend
+				const keyRes = await fetch(`${API_BASE}/razorpay/key`);
+				const keyData = await keyRes.json();
+				const razorpayKey = keyData.key;
+
+				// 5. Open Razorpay modal and wait for result
+				const verifiedOrderId = await new Promise((resolve, reject) => {
+					const rzp = new window.Razorpay({
+						key: razorpayKey,
+						amount: rpOrderData.order.amount,
+						currency: rpOrderData.order.currency,
+						order_id: rpOrderData.order.id,
+						name: "MoodFresh",
+						description: "Secure Online Payment",
+						image: "/img/logo.png",
+						theme: { color: "#0ea5e9" },
+						prefill: {
+							name: address.fullName,
+							contact: address.phone,
+						},
+						handler: async (response) => {
+							try {
+								// 6. Verify payment signature
+								const verifyRes = await fetch(
+									`${API_BASE}/razorpay/verify-payment`,
+									{
+										method: "POST",
+										headers: {
+											"Content-Type": "application/json",
+											Authorization: `Bearer ${token}`,
+										},
+										body: JSON.stringify({
+											razorpay_order_id:
+												response.razorpay_order_id,
+											razorpay_payment_id:
+												response.razorpay_payment_id,
+											razorpay_signature:
+												response.razorpay_signature,
+											orderId,
+										}),
+									},
+								);
+								const verifyData = await verifyRes.json();
+								if (!verifyRes.ok || !verifyData.success) {
+									reject(
+										new Error(
+											verifyData.message ||
+												"Payment verification failed",
+										),
+									);
+								} else {
+									resolve(orderId);
+								}
+							} catch (e) {
+								reject(e);
+							}
+						},
+						modal: {
+							ondismiss: () => {
+								reject(new Error("Payment cancelled by user"));
+							},
+						},
+					});
+					rzp.open();
+				});
+
+				// 7. Payment verified — clear cart and redirect
+				const isBuyNow = !!searchParams.get("item");
+				if (!isBuyNow) clearCart();
+				router.push(`/order-confirm?orderId=${verifiedOrderId}`);
+				return;
+			}
+
+			// ── COD / Coins-only flow (unchanged) ────────────────────────────────
+			const endpoint = isFullyPaidByCoins
+				? `${API_BASE}/orders/create-cod`
+				: `${API_BASE}/orders/create-cod`;
 
 			const res = await fetch(endpoint, {
 				method: "POST",
@@ -379,7 +523,10 @@ function CheckoutContent() {
 					totalAmount: total,
 					amountPaid: payment === "cod" ? coinsToApply : total,
 					orderType,
-					scheduledDeliveryDate: orderType === "BULK_ADVANCE" ? scheduledDeliveryDate : undefined,
+					scheduledDeliveryDate:
+						orderType === "BULK_ADVANCE"
+							? scheduledDeliveryDate
+							: undefined,
 				}),
 			});
 
