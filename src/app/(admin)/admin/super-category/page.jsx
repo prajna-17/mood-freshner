@@ -180,7 +180,16 @@ export default function AdminSuperCategory() {
             const res = await fetch(`${API}/super-categories/${deleteId}`, {
               method: "DELETE",
             });
-            const data = await res.json();
+            const data = await res.json().catch(() => ({}));
+
+            if (res.status === 404) {
+              setSuperCategories((prev) =>
+                prev.filter((item) => item._id !== deleteId),
+              );
+              setConfirmOpen(false);
+              alert("Super category was already removed. List refreshed.");
+              return;
+            }
 
             if (!res.ok) {
               alert(data?.message || "Delete failed");
