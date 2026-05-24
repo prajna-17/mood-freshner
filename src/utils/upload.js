@@ -1,5 +1,6 @@
 import { generateReactHelpers } from "@uploadthing/react";
+import { API } from "@/utils/api";
 
 export const { useUploadThing } = generateReactHelpers({
-  url: "http://localhost:5000/api/uploadthing",
+  url: `${API}/uploadthing`,
 });

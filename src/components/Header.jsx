@@ -25,6 +25,7 @@ import {
 	Twitter,
 	LogOut,
 	Zap,
+	MessageCircle,
 } from "lucide-react";
 import { usePWAInstall } from "@/hooks/usePWAInstall";
 import { useState, useEffect } from "react";
@@ -45,6 +46,7 @@ export default function Header() {
 	useEffect(() => {
 		if (typeof window !== "undefined") {
 			const token = localStorage.getItem("token");
+			// eslint-disable-next-line react-hooks/set-state-in-effect
 			setIsLoggedIn(!!token);
 		}
 	}, [isMenuOpen]);
@@ -133,6 +135,9 @@ export default function Header() {
 		{ name: "Customer Reviews", href: "/reviews", icon: Star },
 		{ name: "Business Opportunity", href: "/business", icon: Briefcase },
 	];
+
+	const partnershipWhatsappUrl =
+		"https://wa.me/918800091914?text=Hi%20MoodFresh%2C%20I%20want%20to%20apply%20for%20a%20partnership.";
 
 	return (
 		<>
@@ -340,60 +345,72 @@ export default function Header() {
 					</div>
 
 					{/* Sidebar Footer */}
-					<div className="p-6 bg-white border-t border-slate-100">
-						<div className="flex items-center gap-4 mb-6">
+					<div className="p-4 bg-white border-t border-slate-100">
+						<div className="flex items-center justify-between gap-3 mb-3">
 							<div className="flex -space-x-2">
 								{[Instagram, Facebook, Twitter].map(
 									(SocialIcon, i) => (
 										<div
 											key={i}
-											className="w-8 h-8 rounded-full bg-slate-100 border-2 border-white flex items-center justify-center text-slate-600 hover:bg-[#1a3a8a] hover:text-white cursor-pointer transition-all"
+											className="w-7 h-7 rounded-full bg-slate-100 border-2 border-white flex items-center justify-center text-slate-600 hover:bg-[#1a3a8a] hover:text-white cursor-pointer transition-all"
 										>
-											<SocialIcon size={14} />
+											<SocialIcon size={12} />
 										</div>
 									),
 								)}
 							</div>
-							<div className="h-4 w-px bg-slate-200" />
 							<p className="text-[10px] font-bold text-slate-400 tracking-wider uppercase">
 								Follow Us
 							</p>
 						</div>
 
-						<div className="space-y-3">
+						<div className="space-y-1.5">
 							<div className="flex items-center gap-3 text-slate-500">
-								<Mail size={14} />
-								<span className="text-xs font-medium">
+								<Mail size={13} />
+								<span className="text-[11px] font-medium truncate">
 									moodfreshdairy@gmail.com
 								</span>
 							</div>
 							<div className="flex items-center gap-3 text-slate-500">
-								<Phone size={14} />
-								<span className="text-xs font-medium">
-									+91 88000 91914 <br />
-									+91 78959 59613
+								<Phone size={13} />
+								<span className="text-[11px] font-medium">
+									+91 88000 91914 · +91 78959 59613
 								</span>
 							</div>
 						</div>
 
-						<div className="mt-5 space-y-2">
+						<div className="mt-3 space-y-2">
+							<a
+								href={partnershipWhatsappUrl}
+								target="_blank"
+								rel="noopener noreferrer"
+								onClick={() => setIsMenuOpen(false)}
+								className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg font-bold text-xs text-white transition-all duration-300 active:scale-[0.98] shadow-md shadow-green-500/10 hover:shadow-green-500/20"
+								style={{
+									background: "linear-gradient(135deg, #16a34a 0%, #22c55e 100%)",
+								}}
+							>
+								<MessageCircle size={14} strokeWidth={2.5} />
+								<span>Apply for Partnership</span>
+							</a>
+
 							<button
 								onClick={handleSubscriptionClick}
-								className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-bold text-sm text-white transition-all duration-300 active:scale-[0.98] shadow-md shadow-amber-500/10 hover:shadow-amber-500/20"
+								className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg font-bold text-xs text-white transition-all duration-300 active:scale-[0.98] shadow-md shadow-amber-500/10 hover:shadow-amber-500/20"
 								style={{
 									background: "linear-gradient(135deg, #f59e0b 0%, #f97316 100%)",
 								}}
 							>
-								<Zap size={15} strokeWidth={2.5} />
+								<Zap size={14} strokeWidth={2.5} />
 								<span>My Subscription</span>
 							</button>
 
 							{isLoggedIn ? (
 								<button
 									onClick={handleLogout}
-									className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-bold text-sm text-slate-700 bg-slate-100 hover:bg-slate-200 transition-all duration-300 active:scale-[0.98] border border-slate-200/60"
+									className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg font-bold text-xs text-slate-700 bg-slate-100 hover:bg-slate-200 transition-all duration-300 active:scale-[0.98] border border-slate-200/60"
 								>
-									<LogOut size={15} strokeWidth={2.5} className="text-slate-500" />
+									<LogOut size={14} strokeWidth={2.5} className="text-slate-500" />
 									<span>Logout</span>
 								</button>
 							) : (
@@ -402,18 +419,18 @@ export default function Header() {
 										setIsMenuOpen(false);
 										setOpenLogin(true);
 									}}
-									className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-bold text-sm text-white transition-all duration-300 active:scale-[0.98] shadow-md shadow-blue-900/10 hover:shadow-blue-900/20"
+									className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg font-bold text-xs text-white transition-all duration-300 active:scale-[0.98] shadow-md shadow-blue-900/10 hover:shadow-blue-900/20"
 									style={{
 										background: "linear-gradient(135deg, #0c1a4c 0%, #1a3a8a 100%)",
 									}}
 								>
-									<User size={15} strokeWidth={2.5} />
+									<User size={14} strokeWidth={2.5} />
 									<span>Login / Register</span>
 								</button>
 							)}
 						</div>
 
-						<div className="mt-8 pt-6 border-t border-slate-100">
+						<div className="mt-4 pt-3 border-t border-slate-100">
 							<p className="text-[10px] text-slate-400 text-center font-medium">
 								© 2026 MoodFresh Dairy. All rights
 								reserved.

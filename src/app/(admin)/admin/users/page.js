@@ -11,6 +11,15 @@ export default function AdminUsersPage() {
 const [filteredUsers, setFilteredUsers] = useState([]);
 	const [loading, setLoading] = useState(true);
 	const [search, setSearch] = useState("");
+	const [showCreate, setShowCreate] = useState(false);
+	const [saving, setSaving] = useState(false);
+	const [form, setForm] = useState({
+		name: "",
+		email: "",
+		role: "CUSTOMER",
+		coins: 0,
+		isVerified: true,
+	});
 
 	const getToken = () => localStorage.getItem("token");
 
@@ -19,7 +28,7 @@ const [filteredUsers, setFilteredUsers] = useState([]);
 			setLoading(true);
 
 			const res = await fetch(
-				`${API_BASE}/auth/users`,
+				`${API_BASE}/admin/users`,
 				{
 					headers: {
 						Authorization: `Bearer ${getToken()}`,
@@ -69,6 +78,82 @@ setFilteredUsers(fetchedUsers);
 
 	setFilteredUsers(filtered);
 }, [search, users]);
+
+	const handleFormChange = (field, value) => {
+		setForm((prev) => ({ ...prev, [field]: value }));
+	};
+
+	const resetForm = () => {
+		setForm({
+			name: "",
+			email: "",
+			role: "CUSTOMER",
+			coins: 0,
+			isVerified: true,
+		});
+	};
+
+	const createUser = async (e) => {
+		e.preventDefault();
+		if (!form.email.trim()) {
+			alert("Email is required");
+			return;
+		}
+
+		try {
+			setSaving(true);
+			const res = await fetch(`${API_BASE}/admin/users`, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${getToken()}`,
+				},
+				body: JSON.stringify(form),
+			});
+			const data = await res.json();
+
+			if (!res.ok) {
+				alert(data?.message || "User create failed");
+				return;
+			}
+
+			setUsers((prev) => [data.data, ...prev]);
+			resetForm();
+			setShowCreate(false);
+			alert("User created ✔");
+		} catch (err) {
+			console.error(err);
+			alert("Network error");
+		} finally {
+			setSaving(false);
+		}
+	};
+
+	const deleteUser = async (user) => {
+		if (!confirm(`Delete ${user.email}? This cannot be undone.`)) return;
+
+		try {
+			const res = await fetch(`${API_BASE}/admin/users/${user._id}`, {
+				method: "DELETE",
+				headers: {
+					Authorization: `Bearer ${getToken()}`,
+				},
+			});
+			const data = await res.json();
+
+			if (!res.ok) {
+				alert(data?.message || "Delete failed");
+				return;
+			}
+
+			setUsers((prev) => prev.filter((item) => item._id !== user._id));
+			alert("User deleted ✔");
+		} catch (err) {
+			console.error(err);
+			alert("Network error");
+		}
+	};
+
 	const getStatusColor = (status) => {
 		switch (status) {
 			case "APPROVED":
@@ -138,6 +223,22 @@ setFilteredUsers(fetchedUsers);
 						gap: 10,
 					}}
 				>
+					<button
+						onClick={() => setShowCreate((prev) => !prev)}
+						style={{
+							padding: "11px 16px",
+							borderRadius: 10,
+							border: "none",
+							background: "#1a3a8a",
+							color: "#fff",
+							fontSize: 14,
+							fontWeight: 700,
+							cursor: "pointer",
+						}}
+					>
+						{showCreate ? "Close" : "+ Add User"}
+					</button>
+
 					<input
 						type="text"
 						placeholder="Search by name or email"
@@ -156,6 +257,121 @@ setFilteredUsers(fetchedUsers);
 					
 				</div>
 			</div>
+
+			{showCreate && (
+				<form
+					onSubmit={createUser}
+					style={{
+						background: "#fff",
+						border: "1px solid #e2e8f0",
+						borderRadius: 16,
+						padding: 18,
+						marginBottom: 24,
+						display: "grid",
+						gridTemplateColumns:
+							"repeat(auto-fit, minmax(180px, 1fr))",
+						gap: 12,
+					}}
+				>
+					<input
+						type="text"
+						placeholder="Name"
+						value={form.name}
+						onChange={(e) =>
+							handleFormChange("name", e.target.value)
+						}
+						style={{
+							padding: "11px 14px",
+							borderRadius: 10,
+							border: "1px solid #e2e8f0",
+							fontSize: 14,
+						}}
+					/>
+					<input
+						type="email"
+						placeholder="Email *"
+						value={form.email}
+						onChange={(e) =>
+							handleFormChange("email", e.target.value)
+						}
+						style={{
+							padding: "11px 14px",
+							borderRadius: 10,
+							border: "1px solid #e2e8f0",
+							fontSize: 14,
+						}}
+					/>
+					<select
+						value={form.role}
+						onChange={(e) =>
+							handleFormChange("role", e.target.value)
+						}
+						style={{
+							padding: "11px 14px",
+							borderRadius: 10,
+							border: "1px solid #e2e8f0",
+							fontSize: 14,
+							background: "#fff",
+						}}
+					>
+						<option value="CUSTOMER">Customer</option>
+						<option value="ADMIN">Admin</option>
+					</select>
+					<input
+						type="number"
+						min="0"
+						placeholder="Coins"
+						value={form.coins}
+						onChange={(e) =>
+							handleFormChange("coins", e.target.value)
+						}
+						style={{
+							padding: "11px 14px",
+							borderRadius: 10,
+							border: "1px solid #e2e8f0",
+							fontSize: 14,
+						}}
+					/>
+					<label
+						style={{
+							display: "flex",
+							alignItems: "center",
+							gap: 8,
+							fontSize: 14,
+							color: "#334155",
+							fontWeight: 600,
+						}}
+					>
+						<input
+							type="checkbox"
+							checked={form.isVerified}
+							onChange={(e) =>
+								handleFormChange(
+									"isVerified",
+									e.target.checked,
+								)
+							}
+						/>
+						Verified
+					</label>
+					<button
+						type="submit"
+						disabled={saving}
+						style={{
+							padding: "11px 16px",
+							borderRadius: 10,
+							border: "none",
+							background: saving ? "#94a3b8" : "#16a34a",
+							color: "#fff",
+							fontSize: 14,
+							fontWeight: 700,
+							cursor: saving ? "not-allowed" : "pointer",
+						}}
+					>
+						{saving ? "Saving..." : "Create User"}
+					</button>
+				</form>
+			)}
 
 			{/* STATS */}
 			<div
@@ -537,6 +753,27 @@ setFilteredUsers(fetchedUsers);
 											minWidth: 250,
 										}}
 									>
+										<button
+											onClick={() =>
+												deleteUser(user)
+											}
+											style={{
+												width: "100%",
+												marginBottom: 14,
+												padding: "9px 12px",
+												borderRadius: 10,
+												border:
+													"1px solid #fecaca",
+												background: "#fef2f2",
+												color: "#dc2626",
+												fontSize: 13,
+												fontWeight: 700,
+												cursor: "pointer",
+											}}
+										>
+											Delete User
+										</button>
+
 										<p
 											style={{
 												fontSize: 13,

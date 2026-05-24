@@ -168,6 +168,7 @@ export default function ProductTop({ product }) {
           alt={product.title}
           fill
           priority
+          unoptimized
           className="object-cover"
         />
 

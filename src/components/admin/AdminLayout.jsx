@@ -63,6 +63,10 @@ export default function AdminLayout({ children }) {
           Categories
         </Link>
 
+        <Link href="/admin/super-category" className="admin-link">
+          Super Categories
+        </Link>
+
         <Link href="/admin/product" className="admin-link">
           Products
         </Link>

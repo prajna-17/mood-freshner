@@ -11,44 +11,50 @@ import { API } from "@/utils/api";
 export default function AdminCategory() {
   const [categories, setCategories] = useState([]);
   const [step, setStep] = useState(1); // 1-super | 2-category | 3-sub
-  const [superCategory, setSuperCategory] = useState(""); // Men | Women
+  const [superCategories, setSuperCategories] = useState([]);
+  const [superCategory, setSuperCategory] = useState("");
   const [subCategory, setSubCategory] = useState("");
   const [subCategoryId, setSubCategoryId] = useState(null);
   const [subCategories, setSubCategories] = useState([]); // list for modal
+  const [originalSubCategories, setOriginalSubCategories] = useState([]);
   const [subMap, setSubMap] = useState({});
   const [openDropdown, setOpenDropdown] = useState(null);
 
   const token =
     typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
+  const fetchData = async () => {
+    try {
+      const [res, superRes] = await Promise.all([
+        fetch(`${API}/categories`),
+        fetch(`${API}/super-categories`),
+      ]);
+      const data = await res.json();
+      const superData = await superRes.json();
+
+      const cats = data?.data || [];
+      setCategories(cats);
+      setSuperCategories(Array.isArray(superData) ? superData : []);
+      console.log("CATEGORIES:", cats);
+
+      const map = {};
+      for (const cat of cats) {
+        const subRes = await fetch(`${API}/sub-categories?category=${cat._id}`);
+        const subsData = await subRes.json();
+        map[cat._id] = subsData?.data || subsData || [];
+        console.log("Fetching subs for:", cat._id);
+      }
+
+      setSubMap(map);
+    } catch (err) {
+      console.error("Fetch error ❌", err);
+    }
+  };
+
   useEffect(() => {
     if (!API) return;
 
-    const fetchData = async () => {
-      try {
-        const res = await fetch(`${API}/categories`);
-        const data = await res.json();
-
-        const cats = data?.data || [];
-        setCategories(cats);
-        console.log("CATEGORIES:", cats);
-
-        const map = {};
-        for (const cat of cats) {
-          const subRes = await fetch(
-            `${API}/sub-categories?category=${cat._id}`,
-          );
-          const subsData = await subRes.json();
-          map[cat._id] = subsData?.data || subsData || [];
-          console.log("Fetching subs for:", cat._id);
-        }
-
-        setSubMap(map);
-      } catch (err) {
-        console.error("Fetch error ❌", err);
-      }
-    };
-
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchData();
   }, []);
 
@@ -98,6 +104,7 @@ export default function AdminCategory() {
             setName("");
             setSubCategory("");
             setSubCategories([]);
+            setOriginalSubCategories([]);
 
             setImage("");
             setPreview("");
@@ -185,8 +192,7 @@ export default function AdminCategory() {
                   setImage(cat.image);
                   setPreview(cat.image);
 
-                  // 🔥 NEW
-                  setSuperCategory(cat.superCategory?.name || "");
+                  setSuperCategory(cat.superCategory?._id || cat.superCategory || "");
                   setStep(1);
 
                   // fetch subcategory for this category
@@ -194,7 +200,9 @@ export default function AdminCategory() {
                     `${API}/sub-categories?category=${cat._id}`,
                   );
                   const subs = await subRes.json();
-                  setSubCategories(subs?.data || subs || []);
+                  const subList = subs?.data || subs || [];
+                  setSubCategories(subList);
+                  setOriginalSubCategories(subList);
                   setSubCategory(""); // clear input
 
                   setOpenModal(true);
@@ -239,24 +247,33 @@ export default function AdminCategory() {
                 onChange={(e) => setSuperCategory(e.target.value)}
               >
                 <option value="">Select</option>
-                <option value="Milk Products">Milk Products</option>
-                <option value="Beverages">Beverages</option>
+                {superCategories.map((item) => (
+                  <option key={item._id} value={item._id}>
+                    {item.name}
+                  </option>
+                ))}
               </select>
             ) : (
               <div style={{ display: "flex", gap: 12 }}>
-                {["Milk Products", "Beverages"].map((s) => (
+                {superCategories.map((s) => (
                   <button
-                    key={s}
-                    className={`primary-btn ${superCategory === s ? "active" : ""}`}
+                    key={s._id}
+                    className={`primary-btn ${superCategory === s._id ? "active" : ""}`}
                     onClick={() => {
-                      setSuperCategory(s);
+                      setSuperCategory(s._id);
                       setStep(2);
                     }}
                   >
-                    {s}
+                    {s.name}
                   </button>
                 ))}
               </div>
+            )}
+
+            {!superCategories.length && (
+              <p style={{ marginTop: 12, color: "#666" }}>
+                Create a super category first from the Super Categories page.
+              </p>
             )}
 
             {editMode && (
@@ -383,26 +400,42 @@ export default function AdminCategory() {
                 }
 
                 try {
+                  if (!superCategory || !name || !image) {
+                    alert("Super category, category name & image required");
+                    return;
+                  }
+
                   /* ===== EDIT MODE ===== */
                   if (editMode) {
-                    await fetch(`${API}/categories/${currentId}`, {
+                    const categoryRes = await fetch(`${API}/categories/${currentId}`, {
                       method: "PUT",
                       headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({ name, image }),
+                      body: JSON.stringify({ name, image, superCategory }),
                     });
+                    const updatedCategory = await categoryRes.json();
+
+                    if (!categoryRes.ok) {
+                      alert(updatedCategory?.message || "Category update failed");
+                      return;
+                    }
 
                     for (const s of subCategories) {
                       // EXISTING subcategory → UPDATE
                       if (s._id) {
-                        await fetch(`${API}/sub-categories/${s._id}`, {
+                        const subRes = await fetch(`${API}/sub-categories/${s._id}`, {
                           method: "PUT",
                           headers: { "Content-Type": "application/json" },
                           body: JSON.stringify({ name: s.name }),
                         });
+                        const subData = await subRes.json();
+                        if (!subRes.ok) {
+                          alert(subData?.message || "Subcategory update failed");
+                          return;
+                        }
                       }
                       // NEW subcategory → CREATE
                       else {
-                        await fetch(`${API}/sub-categories`, {
+                        const subRes = await fetch(`${API}/sub-categories`, {
                           method: "POST",
                           headers: { "Content-Type": "application/json" },
                           body: JSON.stringify({
@@ -410,8 +443,47 @@ export default function AdminCategory() {
                             category: currentId,
                           }),
                         });
+                        const subData = await subRes.json();
+                        if (!subRes.ok) {
+                          alert(subData?.message || "Subcategory create failed");
+                          return;
+                        }
                       }
                     }
+
+                    const keptIds = new Set(
+                      subCategories.filter((s) => s._id).map((s) => s._id),
+                    );
+                    const removedSubCategories = originalSubCategories.filter(
+                      (s) => s._id && !keptIds.has(s._id),
+                    );
+
+                    for (const s of removedSubCategories) {
+                      const deleteRes = await fetch(`${API}/sub-categories/${s._id}`, {
+                        method: "DELETE",
+                      });
+                      const deleteData = await deleteRes.json();
+                      if (!deleteRes.ok) {
+                        alert(deleteData?.message || "Subcategory delete failed");
+                        return;
+                      }
+                    }
+
+                    const subRes = await fetch(
+                      `${API}/sub-categories?category=${currentId}`,
+                    );
+                    const subs = await subRes.json();
+                    const nextSubs = subs?.data || subs || [];
+
+                    setCategories((prev) =>
+                      prev.map((cat) =>
+                        cat._id === currentId ? updatedCategory : cat,
+                      ),
+                    );
+                    setSubMap((prev) => ({
+                      ...prev,
+                      [currentId]: nextSubs,
+                    }));
 
                     alert("Category updated ✔");
                     setOpenModal(false);
@@ -419,36 +491,21 @@ export default function AdminCategory() {
                   }
 
                   /* ===== CREATE MODE ===== */
-                  const scRes = await fetch(`${API}/super-categories`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ name: superCategory }),
-                  });
-
-                  let sc;
-                  if (!scRes.ok) {
-                    // already exists → fetch it
-                    const all = await fetch(`${API}/super-categories`).then(
-                      (r) => r.json(),
-                    );
-                    sc = all.find(
-                      (x) =>
-                        x.name.toLowerCase() === superCategory.toLowerCase(),
-                    );
-                  } else {
-                    sc = await scRes.json();
-                  }
-
                   const catRes = await fetch(`${API}/categories`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
                       name,
                       image,
-                      superCategory: sc._id,
+                      superCategory,
                     }),
                   });
                   const cat = await catRes.json();
+
+                  if (!catRes.ok) {
+                    alert(cat?.message || "Category create failed");
+                    return;
+                  }
 
                   for (const s of subCategories) {
                     await fetch(`${API}/sub-categories`, {
@@ -470,7 +527,7 @@ export default function AdminCategory() {
 
                   setSubMap((prev) => ({
                     ...prev,
-                    [cat._id]: subs,
+                    [cat._id]: subs?.data || subs || [],
                   }));
 
                   alert("Category created ✔");

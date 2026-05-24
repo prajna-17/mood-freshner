@@ -9,6 +9,23 @@ import { API } from "@/utils/api";
 export default function TodaysFresh() {
   const [items, setItems] = useState([]);
 
+  const getProductImage = (item) => {
+    if (typeof item?.images?.[0] === "string" && item.images[0].trim()) {
+      return item.images[0].trim();
+    }
+
+    if (typeof item?.image === "string" && item.image.trim()) {
+      return item.image.trim();
+    }
+
+    const colorImage = item?.colorImages?.find((entry) => entry?.images?.[0]);
+    if (typeof colorImage?.images?.[0] === "string") {
+      return colorImage.images[0].trim();
+    }
+
+    return "/img/placeholder.jpg";
+  };
+
   const fetchProducts = () => {
     const pincode = localStorage.getItem("pincode");
 
@@ -43,7 +60,7 @@ export default function TodaysFresh() {
           className="text-2xl font-md text-gray-900"
           style={{ fontFamily: "Georgia, serif" }}
         >
-          Today's Fresh
+          Today&apos;s Fresh
         </h2>
         <Link href="/products" className="text-orange-500 underline text-sm">
           See All
@@ -58,12 +75,14 @@ export default function TodaysFresh() {
                 {TAGS[idx % TAGS.length]}
               </span>
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 relative">
+                <div className="w-20 h-20 sm:w-28 sm:h-28 relative shrink-0 overflow-hidden rounded-xl bg-gray-50">
                   <Image
-                    src={item.images?.[0] || "/img/placeholder.jpg"}
-                    alt={item.title}
+                    src={getProductImage(item)}
+                    alt={item.title || "Product image"}
                     fill
-                    className="object-contain"
+                    unoptimized
+                    sizes="(max-width: 640px) 80px, 112px"
+                    className="object-cover"
                   />
                 </div>
                 <div className="flex-1">
