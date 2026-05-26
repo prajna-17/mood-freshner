@@ -35,14 +35,12 @@ export default function AdminCategory() {
       const cats = data?.data || [];
       setCategories(cats);
       setSuperCategories(Array.isArray(superData) ? superData : []);
-      console.log("CATEGORIES:", cats);
 
       const map = {};
       for (const cat of cats) {
         const subRes = await fetch(`${API}/sub-categories?category=${cat._id}`);
         const subsData = await subRes.json();
         map[cat._id] = subsData?.data || subsData || [];
-        console.log("Fetching subs for:", cat._id);
       }
 
       setSubMap(map);
@@ -53,8 +51,6 @@ export default function AdminCategory() {
 
   useEffect(() => {
     if (!API) return;
-
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchData();
   }, []);
 
@@ -71,7 +67,7 @@ export default function AdminCategory() {
 
   const { startUpload, isUploading } = useUploadThing("imageUploader", {
     onClientUploadComplete: (res) => {
-      setImage(res[0].ufsUrl); // ✅ correct
+      setImage(res[0].ufsUrl);
     },
     onUploadError: () => alert("Upload failed ❌"),
   });
@@ -105,7 +101,6 @@ export default function AdminCategory() {
             setSubCategory("");
             setSubCategories([]);
             setOriginalSubCategories([]);
-
             setImage("");
             setPreview("");
             setOpenModal(true);
@@ -133,7 +128,6 @@ export default function AdminCategory() {
                 <span className="text-sm font-bold text-gray-800 gap-3">
                   Subcategories
                 </span>
-
                 <span className="text-xs bg-gray-300 px-2 py-1 rounded-full">
                   {subMap[cat._id]?.length || 0}
                 </span>
@@ -150,15 +144,12 @@ export default function AdminCategory() {
                         <span className="text-sm text-gray-700">
                           {sub.name}
                         </span>
-
                         <button
                           onClick={async () => {
                             if (!confirm("Delete this subcategory?")) return;
-
                             await fetch(`${API}/sub-categories/${sub._id}`, {
                               method: "DELETE",
                             });
-
                             setSubMap((prev) => ({
                               ...prev,
                               [cat._id]: prev[cat._id].filter(
@@ -187,15 +178,12 @@ export default function AdminCategory() {
                 onClick={async () => {
                   setEditMode(true);
                   setCurrentId(cat._id);
-
                   setName(cat.name);
                   setImage(cat.image);
                   setPreview(cat.image);
-
                   setSuperCategory(cat.superCategory?._id || cat.superCategory || "");
                   setStep(1);
 
-                  // fetch subcategory for this category
                   const subRes = await fetch(
                     `${API}/sub-categories?category=${cat._id}`,
                   );
@@ -203,7 +191,7 @@ export default function AdminCategory() {
                   const subList = subs?.data || subs || [];
                   setSubCategories(subList);
                   setOriginalSubCategories(subList);
-                  setSubCategory(""); // clear input
+                  setSubCategory("");
 
                   setOpenModal(true);
                 }}
@@ -235,43 +223,57 @@ export default function AdminCategory() {
       >
         {/* STEP 1 – SUPER CATEGORY */}
         {step === 1 && (
-          <div className="text-gray-900">
-            <h3 className="mb-3 font-medium">
+          <div className="text-gray-900 flex flex-col gap-4">
+            <h3 className="text-md font-bold text-gray-800 border-b pb-2 mb-1">
               {editMode ? "Change Super Category" : "Select Super Category"}
             </h3>
 
             {editMode ? (
-              <select
-                className="modal-input"
-                value={superCategory}
-                onChange={(e) => setSuperCategory(e.target.value)}
-              >
-                <option value="">Select</option>
-                {superCategories.map((item) => (
-                  <option key={item._id} value={item._id}>
-                    {item.name}
-                  </option>
-                ))}
-              </select>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-bold uppercase tracking-wider text-gray-500">
+                  Super Category
+                </label>
+                <select
+                  className="modal-input text-gray-800"
+                  value={superCategory}
+                  onChange={(e) => setSuperCategory(e.target.value)}
+                >
+                  <option value="">Select</option>
+                  {superCategories.map((item) => (
+                    <option key={item._id} value={item._id}>
+                      {item.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
             ) : (
-              <div style={{ display: "flex", gap: 12 }}>
-                {superCategories.map((s) => (
-                  <button
-                    key={s._id}
-                    className={`primary-btn ${superCategory === s._id ? "active" : ""}`}
-                    onClick={() => {
-                      setSuperCategory(s._id);
-                      setStep(2);
-                    }}
-                  >
-                    {s.name}
-                  </button>
-                ))}
+              <div className="flex flex-col gap-2">
+                <label className="text-xs font-bold uppercase tracking-wider text-gray-500">
+                  Choose a Super Category to continue
+                </label>
+                <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+                  {superCategories.map((s) => (
+                    <button
+                      key={s._id}
+                      className={`primary-btn text-sm ${
+                        superCategory === s._id
+                          ? "bg-blue-700 text-white"
+                          : "bg-gray-100 text-gray-700"
+                      }`}
+                      onClick={() => {
+                        setSuperCategory(s._id);
+                        setStep(2);
+                      }}
+                    >
+                      {s.name}
+                    </button>
+                  ))}
+                </div>
               </div>
             )}
 
             {!superCategories.length && (
-              <p style={{ marginTop: 12, color: "#666" }}>
+              <p className="text-sm text-gray-500 mt-2">
                 Create a super category first from the Super Categories page.
               </p>
             )}
@@ -287,33 +289,51 @@ export default function AdminCategory() {
           </div>
         )}
 
-        {/* STEP 2 – CATEGORY */}
+        {/* STEP 2 – CATEGORY DETAILS */}
         {step === 2 && (
-          <div className="text-gray-900">
-            <input
-              type="text"
-              className="modal-input"
-              placeholder="Category Name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
+          <div className="text-gray-900 flex flex-col gap-4">
+            <h3 className="text-md font-bold text-gray-800 border-b pb-2 mb-1">
+              Category Details
+            </h3>
 
-            <input
-              type="file"
-              accept="image/*"
-              disabled={isUploading}
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (!file) return;
-                setPreview(URL.createObjectURL(file));
-                startUpload([file]);
-              }}
-            />
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-bold uppercase tracking-wider text-gray-500">
+                Category Name
+              </label>
+              <input
+                type="text"
+                className="modal-input text-gray-800"
+                placeholder="Category Name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-bold uppercase tracking-wider text-gray-500">
+                Category Image
+              </label>
+              <input
+                type="file"
+                accept="image/*"
+                disabled={isUploading}
+                className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+                  setPreview(URL.createObjectURL(file));
+                  startUpload([file]);
+                }}
+              />
+              {isUploading && (
+                <p className="text-xs text-blue-500 font-medium">Uploading image...</p>
+              )}
+            </div>
 
             {preview && (
               <img
                 src={preview}
-                style={{ width: 100, height: 100, borderRadius: 8 }}
+                style={{ width: 100, height: 100, borderRadius: 8, objectFit: "cover" }}
               />
             )}
 
@@ -332,67 +352,73 @@ export default function AdminCategory() {
           </div>
         )}
 
-        {/* STEP 3 – SUB CATEGORY */}
+        {/* STEP 3 – SUB CATEGORIES */}
         {step === 3 && (
-          <div className="text-gray-900">
-            <div style={{ display: "flex", gap: 8 }}>
-              <input
-                type="text"
-                className="modal-input"
-                placeholder="Sub Category Name"
-                value={subCategory}
-                onChange={(e) => setSubCategory(e.target.value)}
-              />
+          <div className="text-gray-900 flex flex-col gap-4">
+            <h3 className="text-md font-bold text-gray-800 border-b pb-2 mb-1">
+              Sub-Categories
+            </h3>
 
-              <button
-                className="primary-btn"
-                onClick={() => {
-                  if (!subCategory.trim()) return;
-
-                  const exists = subCategories.some(
-                    (s) =>
-                      s.name.trim().toLowerCase() ===
-                      subCategory.trim().toLowerCase(),
-                  );
-
-                  if (exists) {
-                    alert("SubCategory already added in this category ⚠️");
-                    return;
-                  }
-
-                  setSubCategories((p) => [...p, { name: subCategory.trim() }]);
-
-                  setSubCategory("");
-                }}
-              >
-                Add
-              </button>
-            </div>
-
-            {/* LIST */}
-            <div style={{ marginTop: 10 }}>
-              {subCategories.map((s, index) => (
-                <div
-                  key={s._id ?? `new-${index}`}
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    padding: "6px 0",
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-bold uppercase tracking-wider text-gray-500">
+                Add Sub Category
+              </label>
+              <div style={{ display: "flex", gap: 8 }}>
+                <input
+                  type="text"
+                  className="modal-input text-gray-800"
+                  placeholder="Sub Category Name"
+                  value={subCategory}
+                  onChange={(e) => setSubCategory(e.target.value)}
+                />
+                <button
+                  className="primary-btn"
+                  style={{ fontSize: 14, padding: "8px 16px" }}
+                  onClick={() => {
+                    if (!subCategory.trim()) return;
+                    const exists = subCategories.some(
+                      (s) =>
+                        s.name.trim().toLowerCase() ===
+                        subCategory.trim().toLowerCase(),
+                    );
+                    if (exists) {
+                      alert("SubCategory already added in this category ⚠️");
+                      return;
+                    }
+                    setSubCategories((p) => [...p, { name: subCategory.trim() }]);
+                    setSubCategory("");
                   }}
                 >
-                  <span>{s.name}</span>
-                  <button
-                    onClick={() =>
-                      setSubCategories((p) => p.filter((_, i) => i !== index))
-                    }
-                  ></button>
-                </div>
-              ))}
+                  Add
+                </button>
+              </div>
             </div>
+
+            {/* SUB CATEGORY LIST */}
+            {subCategories.length > 0 && (
+              <div className="border rounded-lg divide-y bg-gray-50 max-h-44 overflow-y-auto px-3">
+                {subCategories.map((s, index) => (
+                  <div
+                    key={s._id ?? `new-${index}`}
+                    className="flex justify-between items-center py-2"
+                  >
+                    <span className="text-sm font-medium text-gray-700">{s.name}</span>
+                    <button
+                      onClick={() =>
+                        setSubCategories((p) => p.filter((_, i) => i !== index))
+                      }
+                      className="text-xs text-red-500 font-bold hover:text-red-700 px-2 py-1"
+                    >
+                      ✕ Remove
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
 
             <button
               className="primary-btn create-btn"
-              style={{ marginTop: 16 }}
+              style={{ marginTop: 8 }}
               onClick={async () => {
                 if (subCategories.length === 0) {
                   alert("Add at least one subcategory");
@@ -519,7 +545,6 @@ export default function AdminCategory() {
                   }
 
                   setCategories((p) => [...p, cat]);
-                  // fetch subcategories again for this category
                   const subRes = await fetch(
                     `${API}/sub-categories?category=${cat._id}`,
                   );
@@ -551,9 +576,6 @@ export default function AdminCategory() {
           try {
             const r = await fetch(`${API}/categories/${deleteId}`, {
               method: "DELETE",
-              // headers: {
-              //   Authorization: `Bearer ${token}`,
-              // },
               headers: {
                 "Content-Type": "application/json",
               },

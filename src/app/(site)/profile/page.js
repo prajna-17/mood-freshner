@@ -66,7 +66,7 @@ function AddressModal({ initial, onSave, onClose }) {
 			const token = getToken();
 			await saveAddress(form, token);
 
-			saveAddressToStorage(form);
+			// saveAddressToStorage(form);
 
 			localStorage.setItem("pincode", form.postalCode);
 

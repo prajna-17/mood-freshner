@@ -156,14 +156,23 @@ export default function AdminSuperCategory() {
           resetForm();
         }}
       >
-        <div className="form-row">
-          <input
-            type="text"
-            className="modal-input"
-            placeholder="Super Category Name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
+        <div className="flex flex-col gap-4">
+          <h3 className="text-md font-bold text-gray-800 border-b pb-2 mb-1">
+            Super Category Details
+          </h3>
+
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-bold uppercase tracking-wider text-gray-500">
+              Super Category Name
+            </label>
+            <input
+              type="text"
+              className="modal-input text-gray-800"
+              placeholder="Super Category Name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+          </div>
 
           <button className="primary-btn create-btn" onClick={handleSave}>
             Save

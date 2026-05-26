@@ -175,168 +175,199 @@ export default function EditProductPage() {
 
   return (
     <div>
-      <h1 className="page-title">Edit Product</h1>
+      <h1 className="page-title text-gray-800 font-extrabold mb-6">Edit Product</h1>
 
-      <div className="create-prod-form">
-        <input
-          ref={mainFileRef}
-          type="file"
-          multiple
-          accept="image/*"
-          onChange={(e) => handleImageUpload(e.target.files)}
-        />
-
-        <div className="image-preview-box">
-          {[...previewImages, ...images].map((img, i) => (
-            <div key={i} style={{ position: "relative" }}>
-              <img src={img} className="preview-img" />
-              <span
-                onClick={() => removeMainImage(i)}
-                style={{
-                  position: "absolute",
-                  top: -6,
-                  right: -6,
-                  background: "#000",
-                  color: "#fff",
-                  borderRadius: "50%",
-                  width: 18,
-                  height: 18,
-                  fontSize: 12,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  cursor: "pointer",
-                }}
-              >
-                ✕
-              </span>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 text-gray-900">
+        {/* Left Column: Basic Details & Media */}
+        <div className="flex flex-col gap-6">
+          {/* Card 1: Basic Information */}
+          <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex flex-col gap-4">
+            <h3 className="text-md font-bold text-gray-800 border-b pb-2 mb-1">Basic Information</h3>
+            
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-bold uppercase tracking-wider text-gray-500">Product Name</label>
+              <input
+                className="modal-input"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="Product Name"
+              />
             </div>
-          ))}
-        </div>
 
-        <input
-          className="modal-input"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder="Product Name"
-        />
-        <textarea
-          className="modal-input"
-          rows={3}
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          placeholder="Description"
-        />
-        {/* 
-        <input
-          className="modal-input"
-          placeholder="Color (Red / Blue)"
-          value={currentColor}
-          onChange={(e) => setCurrentColor(e.target.value)}
-        /> */}
-        {/* <input
-          ref={colorFileRef}
-          type="file"
-          multiple
-          accept="image/*"
-          onChange={(e) => handleColorUpload([...e.target.files])}
-        /> */}
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-bold uppercase tracking-wider text-gray-500">Description</label>
+              <textarea
+                className="modal-input"
+                rows={4}
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Description"
+              />
+            </div>
+          </div>
 
-        {colorImages.length > 0 && (
-          <div
-            style={{
-              marginTop: 10,
-              display: "flex",
-              gap: 16,
-              flexWrap: "wrap",
-            }}
-          >
-            {colorImages.map((c, i) => (
-              <div key={i}>
-                <p style={{ fontSize: 12, fontWeight: 500 }}>
-                  Color: {c.color}
-                </p>
-                <div className="image-preview-box">
-                  {c.images.map((img, idx) => (
-                    <div key={idx} style={{ position: "relative" }}>
-                      <img src={img} className="preview-img" />
-                      <span
-                        onClick={() => removeColorImage(i, idx)}
-                        style={{
-                          position: "absolute",
-                          top: -6,
-                          right: -6,
-                          background: "#000",
-                          color: "#fff",
-                          borderRadius: "50%",
-                          width: 18,
-                          height: 18,
-                          fontSize: 12,
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          cursor: "pointer",
-                        }}
-                      >
-                        ✕
-                      </span>
+          {/* Card 2: Product Gallery */}
+          <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex flex-col gap-4">
+            <h3 className="text-md font-bold text-gray-800 border-b pb-2 mb-1">Product Gallery</h3>
+            
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-bold uppercase tracking-wider text-gray-500">Upload Product Images</label>
+              <input
+                ref={mainFileRef}
+                type="file"
+                multiple
+                accept="image/*"
+                className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                onChange={(e) => handleImageUpload(e.target.files)}
+              />
+            </div>
+
+            {(previewImages.length > 0 || images.length > 0) && (
+              <div className="image-preview-box mt-3 p-2 bg-gray-50 rounded-lg">
+                {[...previewImages, ...images].map((img, i) => (
+                  <div key={i} style={{ position: "relative" }}>
+                    <img src={img} className="preview-img" />
+                    <span
+                      onClick={() => removeMainImage(i)}
+                      style={{
+                        position: "absolute",
+                        top: -6,
+                        right: -6,
+                        background: "#000",
+                        color: "#fff",
+                        borderRadius: "50%",
+                        width: 18,
+                        height: 18,
+                        fontSize: 12,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        cursor: "pointer",
+                      }}
+                    >
+                      ✕
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {colorImages.length > 0 && (
+              <div className="mt-4 border-t pt-4">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">Color Variants Gallery</h4>
+                <div className="flex flex-col gap-4 bg-gray-50 p-3 rounded-lg">
+                  {colorImages.map((c, i) => (
+                    <div key={i} className="border-b last:border-0 pb-3 last:pb-0">
+                      <p className="text-sm font-semibold text-gray-700 mb-2">
+                        Color: <span className="text-blue-600">{c.color}</span>
+                      </p>
+                      <div className="image-preview-box">
+                        {c.images.map((img, idx) => (
+                          <div key={idx} style={{ position: "relative" }}>
+                            <img src={img} className="preview-img" />
+                            <span
+                              onClick={() => removeColorImage(i, idx)}
+                              style={{
+                                position: "absolute",
+                                top: -6,
+                                right: -6,
+                                background: "#000",
+                                color: "#fff",
+                                borderRadius: "50%",
+                                width: 18,
+                                height: 18,
+                                fontSize: 12,
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                cursor: "pointer",
+                              }}
+                            >
+                              ✕
+                            </span>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   ))}
                 </div>
               </div>
-            ))}
+            )}
           </div>
-        )}
-
-        <input
-          className="modal-input"
-          value={price}
-          onChange={(e) => setPrice(e.target.value)}
-          placeholder="Price"
-        />
-        <input
-          className="modal-input"
-          value={oldPrice}
-          onChange={(e) => setOldPrice(e.target.value)}
-          placeholder="Old Price"
-        />
-        <input
-          className="modal-input"
-          placeholder="Available Pincodes (560001,560002)"
-          value={pincodes}
-          onChange={(e) => setPincodes(e.target.value)}
-        />
-        <input
-          className="modal-input"
-          value={quantity}
-          onChange={(e) => setQuantity(e.target.value)}
-          placeholder="Quantity"
-        />
-        {/* <input
-          className="modal-input"
-          value={sizes}
-          onChange={(e) => setSizes(e.target.value)}
-          placeholder="Sizes (S,M,L)"
-        /> */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 8,
-            marginTop: 10,
-          }}
-        >
-          <input
-            type="checkbox"
-            checked={inStock}
-            onChange={(e) => setInStock(e.target.checked)}
-          />
-          <label>In Stock</label>
         </div>
 
-        <button className="primary-btn create-btn" onClick={updateProduct}>
-          Update Product
-        </button>
+        {/* Right Column: Pricing & Delivery */}
+        <div className="flex flex-col gap-6">
+          {/* Card 3: Delivery Options */}
+          <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex flex-col gap-4">
+            <h3 className="text-md font-bold text-gray-800 border-b pb-2 mb-1">Delivery</h3>
+            
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-bold uppercase tracking-wider text-gray-500">Available Pincodes</label>
+              <input
+                className="modal-input"
+                placeholder="Pincodes (e.g. 560001,560002)"
+                value={pincodes}
+                onChange={(e) => setPincodes(e.target.value)}
+              />
+            </div>
+          </div>
+
+          {/* Card 4: Pricing & Inventory */}
+          <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex flex-col gap-4">
+            <h3 className="text-md font-bold text-gray-800 border-b pb-2 mb-1">Pricing & Inventory</h3>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-bold uppercase tracking-wider text-gray-500">Price (INR)</label>
+                <input
+                  className="modal-input"
+                  value={price}
+                  onChange={(e) => setPrice(e.target.value)}
+                  placeholder="Price"
+                />
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-bold uppercase tracking-wider text-gray-500">Old Price (INR)</label>
+                <input
+                  className="modal-input"
+                  value={oldPrice}
+                  onChange={(e) => setOldPrice(e.target.value)}
+                  placeholder="Old Price"
+                />
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-bold uppercase tracking-wider text-gray-500">Quantity In Stock</label>
+              <input
+                className="modal-input"
+                value={quantity}
+                onChange={(e) => setQuantity(e.target.value)}
+                placeholder="Quantity"
+              />
+            </div>
+
+            <div className="flex items-center gap-2 mt-2 p-2 bg-gray-50 rounded-lg">
+              <input
+                type="checkbox"
+                id="inStockCheckEdit"
+                checked={inStock}
+                onChange={(e) => setInStock(e.target.checked)}
+                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+              />
+              <label htmlFor="inStockCheckEdit" className="text-sm font-semibold text-gray-700 cursor-pointer">
+                In Stock & Available
+              </label>
+            </div>
+          </div>
+
+          {/* Action button */}
+          <button className="primary-btn create-btn py-3 w-full" onClick={updateProduct}>
+            Update Product
+          </button>
+        </div>
       </div>
     </div>
   );
