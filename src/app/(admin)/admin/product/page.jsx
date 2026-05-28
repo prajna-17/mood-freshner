@@ -203,28 +203,37 @@ export default function AdminProducts() {
             </div>
           </div>
 
-          <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-bold uppercase tracking-wider text-gray-500">
-              New Quantity
-            </label>
-            <input
-              className="modal-input"
-              type="number"
-              min="0"
-              step="1"
-              value={quantityValue}
-              onChange={(e) => setQuantityValue(e.target.value)}
-              placeholder="Enter quantity"
-            />
-          </div>
+          {quantityProduct?.sizes && quantityProduct.sizes.length > 0 && typeof quantityProduct.sizes[0] === "object" ? (
+            <div className="bg-amber-50 border border-amber-200 text-amber-800 rounded-lg p-3.5 text-xs flex flex-col gap-1.5">
+              <span className="font-extrabold uppercase">⚠️ Multi-Size Product</span>
+              <span>This product has multiple size variants with specific pricing and inventory. Please click the <strong>Edit</strong> button in the products list to adjust stock for individual sizes safely.</span>
+            </div>
+          ) : (
+            <>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-bold uppercase tracking-wider text-gray-500">
+                  New Quantity
+                </label>
+                <input
+                  className="modal-input"
+                  type="number"
+                  min="0"
+                  step="1"
+                  value={quantityValue}
+                  onChange={(e) => setQuantityValue(e.target.value)}
+                  placeholder="Enter quantity"
+                />
+              </div>
 
-          <button
-            className="primary-btn"
-            onClick={updateQuantity}
-            disabled={quantitySaving}
-          >
-            {quantitySaving ? "Updating..." : "Update Quantity"}
-          </button>
+              <button
+                className="primary-btn"
+                onClick={updateQuantity}
+                disabled={quantitySaving}
+              >
+                {quantitySaving ? "Updating..." : "Update Quantity"}
+              </button>
+            </>
+          )}
         </div>
       </Modal>
     </div>

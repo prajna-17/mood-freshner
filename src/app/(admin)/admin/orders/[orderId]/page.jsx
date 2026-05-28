@@ -255,7 +255,12 @@ export default function AdminOrderDetails() {
                 <div>
                   {p.title} × {p.quantity}
                 </div>
-                <div style={{ opacity: 0.7 }}>₹{p.subtotal}</div>
+                {p.size && (
+                  <div style={{ fontSize: 11, background: "#f3f4f6", padding: "2px 6px", borderRadius: 4, display: "inline-block", marginTop: 2, fontWeight: "bold" }}>
+                    Size: {p.size}
+                  </div>
+                )}
+                <div style={{ opacity: 0.7, marginTop: p.size ? 4 : 2 }}>₹{p.subtotal}</div>
               </div>
             </div>
           ))}

@@ -345,9 +345,8 @@ export default function OrderHistoryPage() {
 										{/* Item names */}
 										<div className="flex-1 min-w-0 ml-1">
 											<p className="text-sm font-black text-gray-800 truncate">
-												{order.products?.[0]
-													?.title ||
-													"Product"}
+												{order.products?.[0]?.title || "Product"}
+												{order.products?.[0]?.size && ` (${order.products[0].size})`}
 											</p>
 											{order.products?.length >
 												1 && (

@@ -6,6 +6,7 @@ import { Heart, Share2, Star } from "lucide-react";
 import { useRouter } from "next/navigation";
 import LoginModal from "@/components/LoginModal";
 import { addToCart, clearCart } from "@/utils/cart";
+
 function CopyLinkBtn({ url }) {
   const [copied, setCopied] = useState(false);
 
@@ -85,6 +86,7 @@ function CopyLinkBtn({ url }) {
     </button>
   );
 }
+
 export default function ProductTop({ product }) {
   const router = useRouter();
   const [qty, setQty] = useState(1);
@@ -92,8 +94,22 @@ export default function ProductTop({ product }) {
   const [openLogin, setOpenLogin] = useState(false);
   const [added, setAdded] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
+
+  const hasSizes = product.sizes && product.sizes.length > 0 && typeof product.sizes[0] === "object";
+  const [selectedSize, setSelectedSize] = useState(() => {
+    if (hasSizes) {
+      const firstAvailable = product.sizes.find(s => s.quantity > 0);
+      return firstAvailable || product.sizes[0];
+    }
+    return null;
+  });
+
+  const displayPrice = selectedSize ? selectedSize.price : product.price;
+  const displayOldPrice = selectedSize ? selectedSize.oldPrice : product.oldPrice;
+  const displayQty = selectedSize ? selectedSize.quantity : product.quantity;
+
   const increase = () => {
-    if (qty < product.quantity) {
+    if (qty < displayQty) {
       setQty((q) => q + 1);
     }
   };
@@ -122,7 +138,10 @@ export default function ProductTop({ product }) {
     addToCart({
       ...product,
       id: product._id,
-      availableQty: product.quantity,
+      price: displayPrice,
+      oldPrice: displayOldPrice,
+      size: selectedSize ? selectedSize.size : undefined,
+      availableQty: displayQty,
       availablePincodes: product.availablePincodes,
     });
 
@@ -144,14 +163,18 @@ export default function ProductTop({ product }) {
         ...product,
         id: product._id,
         qty: qty, // 🔥 VERY IMPORTANT (use selected qty)
+        price: displayPrice,
+        oldPrice: displayOldPrice,
+        size: selectedSize ? selectedSize.size : undefined,
         image: product.images?.[0],
-        availableQty: product.quantity,
+        availableQty: displayQty,
         availablePincodes: product.availablePincodes,
       }),
     );
 
     router.push("/checkout");
   };
+
   return (
     <div className="bg-white">
       {/* HEADER */}
@@ -177,7 +200,6 @@ export default function ProductTop({ product }) {
         </span>
 
         <div className="absolute top-3 right-3 flex gap-2 z-10">
-          {/* inside the absolute top-3 right-3 div — replace the Share2 icon div */}
           <div
             className="bg-white p-2 rounded-full cursor-pointer"
             onClick={() => setShareOpen(true)}
@@ -207,27 +229,60 @@ export default function ProductTop({ product }) {
         {/* PRICE */}
         <div className="flex items-center gap-2 mt-3">
           <p className="text-[18px] font-semibold text-black">
-            ₹{product.price}
+            ₹{displayPrice}
           </p>
 
-          {product.oldPrice && (
+          {displayOldPrice && (
             <p className="text-gray-400 line-through text-sm">
-              ₹{product.oldPrice}
+              ₹{displayOldPrice}
             </p>
           )}
 
-          {product.oldPrice && (
+          {displayOldPrice && (
             <span className="bg-green-100 text-green-600 text-xs px-2 py-0.5 rounded-full font-medium">
               {Math.round(
-                ((product.oldPrice - product.price) / product.oldPrice) * 100,
+                ((displayOldPrice - displayPrice) / displayOldPrice) * 100,
               )}
               % OFF
             </span>
           )}
         </div>
 
-        {/* VOLUME (STATIC UI KEEP) */}
-        {isBeverage && (
+        {/* DYNAMIC SIZES SELECTOR */}
+        {hasSizes && (
+          <div className="mt-5">
+            <p className="text-xs font-bold text-gray-500 mb-2.5 uppercase tracking-wider">Select Size Option</p>
+            <div className="flex gap-3 flex-wrap">
+              {product.sizes.map((s) => {
+                const isSelected = selectedSize && selectedSize.size === s.size;
+                const isOutOfStock = s.quantity <= 0;
+                return (
+                  <button
+                    key={s.size}
+                    disabled={isOutOfStock}
+                    onClick={() => {
+                      setSelectedSize(s);
+                      setQty(1);
+                    }}
+                    className={`px-4 py-2 border rounded-xl text-left transition duration-200 ${
+                      isSelected
+                        ? "bg-orange-50 border-orange-500 text-orange-600 shadow-sm ring-1 ring-orange-500/20"
+                        : isOutOfStock
+                        ? "border-gray-200 bg-gray-50 text-gray-300 cursor-not-allowed line-through animate-pulse"
+                        : "border-gray-300 text-gray-700 hover:border-gray-400 bg-white"
+                    }`}
+                  >
+                    <span className="block font-semibold text-xs">{s.size}</span>
+                    <span className="block text-[10px] font-normal opacity-85 mt-0.5">₹{s.price}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* VOLUME (STATIC UI KEEP AS FALLBACK IF NO DYNAMIC SIZES) */}
+        {!hasSizes && isBeverage && (
           <div className="mt-4">
             <p className="text-xs text-gray-500 mb-2">VOLUME</p>
             <div className="flex gap-2 flex-wrap">
@@ -256,7 +311,7 @@ export default function ProductTop({ product }) {
             <span className="font-medium text-black">{qty}</span>
             <button
               onClick={increase}
-              disabled={qty >= product.quantity}
+              disabled={qty >= displayQty}
               className="text-lg px-2 disabled:opacity-30"
             >
               {" "}
@@ -266,11 +321,11 @@ export default function ProductTop({ product }) {
 
           <span
             className={`text-sm font-medium ${
-              qty <= product.quantity ? "text-green-600" : "text-red-500"
+              qty <= displayQty ? "text-green-600" : "text-red-500"
             }`}
           >
-            {qty <= product.quantity
-              ? `In Stock (${product.quantity} available)`
+            {qty <= displayQty
+              ? `In Stock (${displayQty} available)`
               : "Only limited stock available"}
           </span>
         </div>
@@ -404,7 +459,7 @@ export default function ProductTop({ product }) {
                 onClick={() => {
                   const url = encodeURIComponent(window.location.href);
                   const text = encodeURIComponent(
-                    `Check out ${product.title} at ₹${product.price}! 🛒`,
+                    `Check out ${product.title} at ₹${displayPrice}! 🛒`,
                   );
                   window.open(`https://wa.me/?text=${text}%20${url}`, "_blank");
                 }}
@@ -449,7 +504,7 @@ export default function ProductTop({ product }) {
               <button
                 onClick={() => {
                   navigator.clipboard.writeText(
-                    `${product.title} — ₹${product.price}\n${window.location.href}`,
+                    `${product.title} — ₹${displayPrice}\n${window.location.href}`,
                   );
                   window.open("https://www.instagram.com/", "_blank");
                 }}
@@ -517,7 +572,7 @@ export default function ProductTop({ product }) {
                 onClick={() => {
                   const url = encodeURIComponent(window.location.href);
                   const text = encodeURIComponent(
-                    `Check out ${product.title} at ₹${product.price}!`,
+                    `Check out ${product.title} at ₹${displayPrice}!`,
                   );
                   window.open(
                     `https://twitter.com/intent/tweet?text=${text}&url=${url}`,
@@ -611,7 +666,7 @@ export default function ProductTop({ product }) {
                   flexShrink: 0,
                 }}
               >
-                ₹{product.price}
+                ₹{displayPrice}
               </span>
             </div>
           </div>

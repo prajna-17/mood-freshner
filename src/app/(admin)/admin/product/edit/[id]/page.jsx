@@ -30,6 +30,7 @@ export default function EditProductPage() {
   const [oldPrice, setOldPrice] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [sizes, setSizes] = useState("");
+  const [sizesList, setSizesList] = useState([]);
   const [colors, setColors] = useState("");
   const [categoryId, setCategoryId] = useState("");
   const [sellingCategory, setSellingCategory] = useState("featured");
@@ -59,7 +60,30 @@ export default function EditProductPage() {
     setPrice(data.price);
     setOldPrice(data.oldPrice || "");
     setQuantity(data.quantity);
-    setSizes(data.sizes.join(","));
+    if (data.sizes && data.sizes.length > 0) {
+      if (typeof data.sizes[0] === "object") {
+        setSizesList(
+          data.sizes.map((s) => ({
+            size: s.size,
+            price: s.price,
+            oldPrice: s.oldPrice || "",
+            quantity: s.quantity || 0,
+          })),
+        );
+      } else {
+        // Backward compatibility converter for legacy string sizes
+        setSizesList(
+          data.sizes.map((s) => ({
+            size: s,
+            price: data.price,
+            oldPrice: data.oldPrice || "",
+            quantity: data.quantity || 0,
+          })),
+        );
+      }
+    } else {
+      setSizesList([]);
+    }
     setColors(data.colors.join(","));
     setCategoryId(data.category?._id || "");
     setPincodes((data.availablePincodes || []).join(","));
@@ -143,7 +167,12 @@ export default function EditProductPage() {
       price: Number(price),
       oldPrice: Number(oldPrice),
       quantity: Number(quantity),
-      sizes: sizes.split(",").map((x) => x.trim()),
+      sizes: sizesList.filter((s) => s.size.trim()).map((s) => ({
+        size: s.size.trim(),
+        price: Number(s.price) || 0,
+        oldPrice: s.oldPrice ? Number(s.oldPrice) : undefined,
+        quantity: Number(s.quantity) || 0,
+      })),
       colors: colors.split(",").map((x) => x.trim()),
       category: categoryId,
       availablePincodes: pincodes
@@ -360,6 +389,95 @@ export default function EditProductPage() {
               <label htmlFor="inStockCheckEdit" className="text-sm font-semibold text-gray-700 cursor-pointer">
                 In Stock & Available
               </label>
+            </div>
+
+            {/* SIZES & PRICING CRUD */}
+            <div className="flex flex-col gap-4 border-t pt-4 mt-2">
+              <div className="flex justify-between items-center">
+                <h4 className="text-sm font-extrabold text-gray-800 uppercase tracking-wider">Sizes & Pricing</h4>
+                <button
+                  type="button"
+                  className="text-xs bg-blue-50 text-blue-600 px-3 py-1.5 rounded-lg font-bold hover:bg-blue-100 transition active:scale-95"
+                  onClick={() => setSizesList([...sizesList, { size: "", price: "", oldPrice: "", quantity: "1" }])}
+                >
+                  + Add Size Variant
+                </button>
+              </div>
+
+              {sizesList.length > 0 ? (
+                <div className="flex flex-col gap-3">
+                  {sizesList.map((item, idx) => (
+                    <div key={idx} className="grid grid-cols-1 md:grid-cols-4 gap-3 bg-gray-50 p-3 rounded-xl relative border border-gray-150 shadow-sm">
+                      <div className="flex flex-col gap-1">
+                        <label className="text-[10px] text-gray-500 font-extrabold uppercase">Size Label</label>
+                        <input
+                          className="modal-input text-xs"
+                          placeholder="e.g. 500ml, Small"
+                          value={item.size}
+                          onChange={(e) => {
+                            const updated = [...sizesList];
+                            updated[idx].size = e.target.value;
+                            setSizesList(updated);
+                          }}
+                        />
+                      </div>
+                      <div className="flex flex-col gap-1">
+                        <label className="text-[10px] text-gray-500 font-extrabold uppercase">Price (INR)</label>
+                        <input
+                          className="modal-input text-xs"
+                          type="number"
+                          placeholder="Price"
+                          value={item.price}
+                          onChange={(e) => {
+                            const updated = [...sizesList];
+                            updated[idx].price = e.target.value;
+                            setSizesList(updated);
+                          }}
+                        />
+                      </div>
+                      <div className="flex flex-col gap-1">
+                        <label className="text-[10px] text-gray-500 font-extrabold uppercase">Old Price</label>
+                        <input
+                          className="modal-input text-xs"
+                          type="number"
+                          placeholder="Old Price"
+                          value={item.oldPrice}
+                          onChange={(e) => {
+                            const updated = [...sizesList];
+                            updated[idx].oldPrice = e.target.value;
+                            setSizesList(updated);
+                          }}
+                        />
+                      </div>
+                      <div className="flex flex-col gap-1 relative pr-8">
+                        <label className="text-[10px] text-gray-500 font-extrabold uppercase">Stock Qty</label>
+                        <input
+                          className="modal-input text-xs"
+                          type="number"
+                          placeholder="Stock"
+                          value={item.quantity}
+                          onChange={(e) => {
+                            const updated = [...sizesList];
+                            updated[idx].quantity = e.target.value;
+                            setSizesList(updated);
+                          }}
+                        />
+                        <button
+                          type="button"
+                          className="absolute right-2 bottom-3 text-red-500 hover:text-red-700 font-bold"
+                          onClick={() => {
+                            setSizesList(sizesList.filter((_, i) => i !== idx));
+                          }}
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-xs text-gray-400 italic">No custom sizes added. Product will use the base price and quantity above.</p>
+              )}
             </div>
           </div>
 

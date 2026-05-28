@@ -290,7 +290,12 @@ export default function AdminOrders() {
                       }}
                     />
                     <div style={{ fontSize: 13 }}>
-                      {p.title} × {p.quantity}
+                      <div>{p.title} × {p.quantity}</div>
+                      {p.size && (
+                        <span style={{ fontSize: 10, background: "#f3f4f6", padding: "1px 4px", borderRadius: 3, display: "inline-block", marginTop: 2, fontWeight: "bold" }}>
+                          Size: {p.size}
+                        </span>
+                      )}
                     </div>
                   </div>
                 ))}

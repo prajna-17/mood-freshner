@@ -29,14 +29,21 @@ export default function CartItemCard({ item }) {
         <div className="flex-1">
           {/* Title + Delete */}
           <div className="flex justify-between">
-            <h3 className="text-sm font-semibold text-gray-800 leading-tight">
-              {item.title}{" "}
-            </h3>
+            <div>
+              <h3 className="text-sm font-semibold text-gray-800 leading-tight">
+                {item.title}
+              </h3>
+              {item.size && (
+                <span className="text-xs bg-gray-100 text-gray-600 px-2.5 py-0.5 rounded-full inline-block mt-1.5 font-bold uppercase tracking-wider">
+                  Size: {item.size}
+                </span>
+              )}
+            </div>
             <Trash2
               size={18}
               className="text-gray-400 cursor-pointer"
               onClick={() => removeFromCart(item.variantId)}
-            />{" "}
+            />
           </div>
 
           <span className="text-gray-800 font-medium">{item.qty}</span>
@@ -53,17 +60,21 @@ export default function CartItemCard({ item }) {
 
           {/* Price */}
           <div className="flex items-center gap-2 mt-2">
-            <p className="text-sm text-gray-400">
-              MRP <span className="line-through ml-1">₹ {item.oldPrice}</span>
-            </p>
+            {item.oldPrice && (
+              <p className="text-xs text-gray-400">
+                MRP <span className="line-through ml-1">₹ {item.oldPrice}</span>
+              </p>
+            )}
 
-            <p className="text-lg font-semibold text-gray-800">
+            <p className="text-base font-bold text-gray-800">
               ₹ {item.price}
             </p>
 
-            <span className="bg-green-100 text-green-600 text-xs px-2 py-1 rounded-full">
-              20% off
-            </span>
+            {item.oldPrice && item.discount > 0 && (
+              <span className="bg-green-100 text-green-600 text-[10px] font-bold px-2 py-0.5 rounded-full">
+                {item.discount}% off
+              </span>
+            )}
           </div>
         </div>
       </div>
